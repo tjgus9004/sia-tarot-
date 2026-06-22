@@ -1138,7 +1138,7 @@ function buyProduct(id){
   if(!prod)return;
   currentProduct=prod;
 
-  if(prod.price===0&&!prod.freeFirst){startReading(prod);return;} // 진짜 무료
+  if(prod.price===0){startReading(prod);return;} // 진짜 무료
   if(prod.freeFirst&&isFreePending()){startReading(prod);return;} // 무료 1회
   if(isPaidFor(prod.id)){startReading(prod);return;}              // 결제 완료
 
