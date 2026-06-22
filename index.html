@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>✨ 신비로운 타로</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+:root{
+  --bg:#0a0712; --surface:#120d22; --card:#1a1030;
+  --gold:#c9a84c; --gold2:#e8c96b; --purple:#6a2fa0;
+  --pink:#e05a9a; --text:#ede8f5; --dim:#8a7fa0;
+  --border:rgba(201,168,76,.18); --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;}
+#app{overflow-x:hidden;}
+
+/* ─── 배경 ─── */
+.bg-layer{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(106,47,160,.35) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%,rgba(80,20,140,.25) 0%,transparent 50%),
+    radial-gradient(ellipse 50% 30% at 80% 60%,rgba(200,80,150,.12) 0%,transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+}
+.stars-layer{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 12%,rgba(255,255,255,.8) 0%,transparent 100%),
+    radial-gradient(1px 1px at 22% 35%,rgba(255,255,255,.5) 0%,transparent 100%),
+    radial-gradient(2px 2px at 40% 8%,rgba(255,220,100,.7) 0%,transparent 100%),
+    radial-gradient(1px 1px at 60% 25%,rgba(255,255,255,.6) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 75% 15%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 88% 40%,rgba(200,150,255,.8) 0%,transparent 100%),
+    radial-gradient(1px 1px at 15% 65%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(2px 2px at 50% 70%,rgba(255,220,100,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 92% 80%,rgba(255,255,255,.6) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 30% 90%,rgba(200,150,255,.6) 0%,transparent 100%),
+    radial-gradient(1px 1px at 68% 88%,rgba(255,255,255,.3) 0%,transparent 100%);
+}
+
+/* ─── 앱 래퍼 ─── */
+#app{position:relative;z-index:1;max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+
+/* ─── 화면 전환 ─── */
+.screen{display:none;flex-direction:column;flex:1;}
+.screen.active{display:flex;}
+
+/* ══════════ 홈 화면 ══════════ */
+/* 헤더 */
+.home-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px 12px;
+  background:linear-gradient(180deg,rgba(10,7,18,.95) 0%,rgba(10,7,18,0) 100%);
+  position:sticky;top:0;z-index:10;
+}
+.header-logo{display:flex;align-items:center;gap:8px;}
+.header-logo .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#2a0a5a,#6a2fa0);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border:1px solid rgba(201,168,76,.4);}
+.logo-icon .logo-s{font-size:1.1rem;font-weight:900;color:var(--gold);font-family:'Georgia',serif;letter-spacing:-1px;line-height:1;position:relative;z-index:1;}
+.logo-icon::before{content:'';position:absolute;inset:2px;border:1px solid rgba(201,168,76,.2);border-radius:5px;}
+.logo-icon::after{content:'·';position:absolute;top:3px;right:4px;font-size:.45rem;color:rgba(201,168,76,.7);}
+.header-logo span{font-size:1.05rem;font-weight:700;color:var(--text);}
+.header-right{display:flex;align-items:center;gap:10px;}
+.user-badge{background:linear-gradient(135deg,var(--gold),#8a6a20);color:#0a0712;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:700;cursor:pointer;}
+.menu-btn{background:transparent;border:none;color:var(--text);font-size:1.4rem;cursor:pointer;padding:4px;}
+
+/* 배너 */
+.banner{
+  margin:8px 14px 0;border-radius:18px;overflow:hidden;
+  background:linear-gradient(135deg,#1e0a3c,#3a1060,#6a2fa0);
+  padding:22px 22px 20px;position:relative;
+}
+.banner::before{
+  content:'✦ ✦ ✦';position:absolute;top:10px;right:16px;
+  color:rgba(201,168,76,.3);font-size:.7rem;letter-spacing:4px;
+}
+.banner-sub{color:rgba(255,255,255,.6);font-size:.78rem;margin-bottom:6px;}
+.banner-title{font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:14px;line-height:1.3;}
+.banner-btn{
+  display:inline-block;background:linear-gradient(135deg,var(--pink),#b03070);
+  color:#fff;padding:9px 22px;border-radius:25px;font-size:.85rem;font-weight:700;
+  border:none;cursor:pointer;
+}
+.banner-art{position:absolute;right:16px;bottom:16px;width:86px;height:76px;}
+.tarot-card-mini{
+  width:30px;height:50px;border-radius:4px;
+  background:linear-gradient(160deg,#1a0a3a,#2a0a5a);
+  border:1.5px solid rgba(201,168,76,.6);
+  display:flex;align-items:center;justify-content:center;
+  position:absolute;overflow:hidden;
+  box-shadow:0 3px 8px rgba(0,0,0,.5);
+}
+.tarot-card-mini::before{
+  content:'';position:absolute;inset:3px;
+  border:1px solid rgba(201,168,76,.25);border-radius:2px;
+}
+.tarot-card-mini::after{
+  content:'✦';color:rgba(201,168,76,.5);font-size:.7rem;
+}
+.tarot-card-mini .star-pattern{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(1px 1px at 20% 25%,rgba(201,168,76,.6) 0%,transparent 100%),
+    radial-gradient(1px 1px at 75% 15%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 50% 70%,rgba(201,168,76,.4) 0%,transparent 100%);
+}
+.card-left{transform:rotate(-14deg);transform-origin:bottom center;left:4px;bottom:4px;z-index:1;}
+.card-mid{transform:rotate(0deg);transform-origin:bottom center;left:28px;bottom:10px;z-index:3;}
+.card-right{transform:rotate(14deg);transform-origin:bottom center;left:52px;bottom:4px;z-index:2;}
+
+/* 카테고리 카드 그리드 (홈화면) */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0;}
+.cat-card{
+  border-radius:14px;padding:18px 14px 16px;cursor:pointer;
+  display:flex;flex-direction:column;gap:6px;
+  border:1px solid rgba(255,255,255,.1);
+  transition:transform .18s,box-shadow .18s;
+  position:relative;overflow:hidden;
+  min-height:100px;
+}
+.cat-card:active{transform:scale(.96);}
+.cat-card-emoji{font-size:1.6rem;line-height:1;}
+.cat-card-name{font-size:1rem;font-weight:800;color:#fff;line-height:1.2;}
+.cat-card-desc{font-size:.68rem;color:rgba(255,255,255,.65);line-height:1.5;}
+.cat-card-arrow{position:absolute;bottom:12px;right:12px;font-size:.75rem;color:rgba(255,255,255,.4);}
+
+/* 카테고리 탭 (상품 목록 화면용) */
+.cat-tabs{display:flex;gap:8px;padding:12px 14px 8px;overflow-x:scroll;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;touch-action:pan-x;overscroll-behavior-x:contain;}
+.cat-tabs::-webkit-scrollbar{display:none;}
+.cat-tab{
+  flex-shrink:0;padding:7px 16px;border-radius:25px;font-size:.82rem;font-weight:500;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);
+  color:var(--dim);cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.cat-tab.active{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:700;}
+
+/* 홈 푸터 */
+#home-footer{display:none;padding:20px 18px 110px;border-top:1px solid rgba(255,255,255,.06);margin-top:8px;}
+.footer-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:14px;}
+.footer-link{font-size:.75rem;color:var(--gold);text-decoration:underline;cursor:pointer;opacity:.85;}
+.footer-biz{font-size:.7rem;color:var(--dim);line-height:1.9;text-align:center;}
+
+/* 상품 그리드 */
+.products-section{padding:6px 14px 130px;}
+.products-section h3{font-size:.78rem;color:var(--gold);letter-spacing:2px;margin-bottom:12px;}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.product-card{
+  background:var(--card);border-radius:12px;
+  border:1px solid var(--border);overflow:hidden;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;
+}
+.product-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(106,47,160,.3);}
+.product-card:active{transform:scale(.97);}
+.product-thumb{
+  width:100%;aspect-ratio:16/9;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;position:relative;overflow:hidden;
+}
+.product-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.product-thumb .thumb-emoji{position:relative;z-index:1;}
+.free-tag{
+  position:absolute;top:6px;left:6px;z-index:2;
+  background:linear-gradient(135deg,#2a8a2a,#1a5a1a);
+  color:#90ee90;font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:6px;
+}
+.product-info{padding:7px 8px 9px;}
+.product-name{font-size:.95rem;font-weight:800;margin-bottom:4px;line-height:1.3;}
+.product-desc{font-size:.7rem;color:var(--dim);line-height:1.6;margin-bottom:6px;}
+.product-bottom{display:flex;align-items:center;justify-content:space-between;gap:4px;}
+.product-price{font-size:.78rem;font-weight:700;color:var(--gold);}
+.product-price.free-price{color:#90ee90;}
+.btn-apply{
+  background:linear-gradient(135deg,var(--pink),#b03070);
+  color:#fff;border:none;border-radius:16px;
+  padding:4px 10px;font-size:.66rem;font-weight:700;cursor:pointer;
+  white-space:nowrap;flex-shrink:0;
+}
+
+/* 하단 네비 */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:rgba(10,7,18,.95);backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:space-around;
+  padding:10px 0 calc(10px + env(safe-area-inset-bottom));z-index:20;
+}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 20px;}
+.nav-item .nav-icon{font-size:1.3rem;}
+.nav-item .nav-label{font-size:.6rem;color:var(--dim);}
+.nav-item.active .nav-label{color:var(--purple);}
+.nav-free-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
+  position:relative;top:-8px;
+}
+.nav-free-inner{
+  width:58px;height:58px;background:linear-gradient(135deg,var(--purple),#3a1060);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;border:3px solid var(--bg);
+  box-shadow:0 4px 20px rgba(106,47,160,.6);
+}
+.nav-free-label{font-size:.6rem;color:var(--gold);font-weight:700;letter-spacing:.5px;}
+
+/* ══════════ 리딩 화면 ══════════ */
+.reading-header{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 18px;border-bottom:1px solid var(--border);
+  background:rgba(10,7,18,.9);position:sticky;top:0;z-index:10;
+}
+.back-btn{background:transparent;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;padding:4px;}
+.reading-header h2{font-size:1rem;font-weight:700;}
+.reading-body{flex:1;padding:20px 16px 100px;display:flex;flex-direction:column;align-items:center;}
+
+/* 카드 선택 안내 */
+.q-section{width:100%;max-width:400px;margin-bottom:24px;text-align:center;}
+.q-instruction{
+  background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);
+  border-radius:12px;padding:14px 18px;font-size:.88rem;line-height:1.8;
+  color:var(--gold);letter-spacing:.5px;
+}
+/* 택일운 날짜 입력 */
+.moving-date-section{width:100%;max-width:400px;margin-bottom:16px;display:none;}
+.moving-date-section.show{display:block;}
+.moving-date-label{color:var(--gold);font-size:.75rem;letter-spacing:1.5px;text-align:center;margin-bottom:10px;}
+.moving-date-row{display:flex;gap:10px;justify-content:center;}
+.moving-date-input{
+  flex:1;max-width:160px;background:rgba(255,255,255,.06);
+  border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;color:var(--text);font-family:inherit;font-size:.85rem;
+  outline:none;text-align:center;
+}
+.moving-date-input:focus{border-color:var(--gold);}
+
+/* 슬롯 */
+.slots-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.slot-item{text-align:center;}
+.slot-lbl{font-size:.65rem;color:var(--gold);letter-spacing:1px;margin-bottom:5px;}
+.slot-box{
+  width:66px;height:108px;border-radius:10px;
+  border:2px dashed rgba(201,168,76,.3);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(201,168,76,.3);font-size:1.3rem;
+  background:rgba(255,255,255,.02);transition:all .25s;overflow:hidden;
+}
+.slot-box.filled{border-style:solid;border-color:var(--gold);box-shadow:0 0 14px rgba(201,168,76,.25);}
+.mini-face{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px;}
+.mini-sym{font-size:1.6rem;line-height:1;}
+.mini-suit{font-size:.48rem;color:rgba(255,255,255,.55);letter-spacing:1px;}
+
+/* 덱 */
+.pick-guide{color:var(--dim);font-size:.82rem;margin-bottom:14px;text-align:center;}
+.deck-wrap{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:360px;}
+.deck-c{
+  width:44px;height:72px;border-radius:6px;
+  background:linear-gradient(135deg,#1e0a3c,#0d0520);
+  border:1px solid rgba(201,168,76,.2);
+  cursor:pointer;transition:all .2s;
+  position:relative;flex-shrink:0;overflow:hidden;
+}
+.deck-c::after{content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(201,168,76,.25);font-size:.85rem;}
+.deck-c:hover:not(.used){border-color:var(--gold);box-shadow:0 0 10px rgba(201,168,76,.45);transform:translateY(-4px);}
+.deck-c.used{opacity:.12;cursor:not-allowed;transform:none!important;}
+
+.btn-reveal{
+  display:none;margin-top:20px;
+  background:linear-gradient(135deg,#8a3a0a,#5a1a00);
+  border:1px solid #e07830;color:#ffc085;
+  padding:14px 36px;border-radius:30px;
+  font-family:inherit;font-size:.95rem;font-weight:700;letter-spacing:2px;
+  cursor:pointer;transition:all .25s;
+}
+.btn-reveal:hover{box-shadow:0 0 28px rgba(224,120,48,.5);transform:translateY(-1px);}
+
+/* ══════════ 결과 화면 ══════════ */
+.result-body{flex:1;padding:16px 14px 100px;}
+.result-q{text-align:center;color:var(--dim);font-size:.82rem;font-style:italic;margin-bottom:18px;}
+.rcard{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:14px;overflow:hidden;animation:fadeUp .5s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.rcard-inner{display:flex;}
+.rcard-art{
+  width:88px;flex-shrink:0;min-height:140px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:8px 4px;overflow:hidden;
+}
+.rcard-art img{width:88px;height:140px;object-fit:cover;display:block;transition:transform .3s;}
+.rcard-art img.rev{transform:rotate(180deg);}
+.rcard-art.rev{transform:rotate(180deg);}
+.rcard-art .asym{font-size:2.4rem;line-height:1;}
+.rcard-art .anum{font-size:.58rem;letter-spacing:2px;opacity:.7;}
+.rcard-art .asuit{font-size:.52rem;opacity:.5;}
+.rcard-txt{flex:1;padding:14px 14px 14px 10px;}
+.rpos{font-size:.65rem;color:var(--gold);letter-spacing:2px;margin-bottom:4px;}
+.rname{font-size:1rem;font-weight:700;color:var(--gold2);margin-bottom:2px;}
+.rkr{font-size:.78rem;color:var(--dim);margin-bottom:7px;}
+.rori{display:inline-block;font-size:.68rem;padding:2px 9px;border-radius:15px;margin-bottom:8px;}
+.rori.up{background:rgba(100,200,100,.1);color:#90ee90;border:1px solid rgba(100,200,100,.2);}
+.rori.rv{background:rgba(200,100,100,.1);color:#ffb3b3;border:1px solid rgba(200,100,100,.2);}
+.rmean{line-height:1.85;font-size:.84rem;}
+.rkws{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;}
+.rkw{font-size:.66rem;padding:2px 7px;border-radius:12px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.15);color:var(--gold);}
+.overall-box{
+  background:linear-gradient(135deg,rgba(106,47,160,.18),rgba(26,10,46,.5));
+  border:1px solid rgba(201,168,76,.25);border-radius:var(--radius);
+  padding:18px;margin-top:6px;animation:fadeUp .7s ease;
+}
+.overall-box h3{color:var(--gold);font-size:.82rem;letter-spacing:2px;margin-bottom:10px;}
+.overall-box p{line-height:1.9;font-size:.85rem;}
+.btn-again{
+  display:block;margin:24px auto 32px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--dim);padding:11px 28px;border-radius:25px;
+  font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .25s;
+}
+.btn-again:hover{border-color:var(--gold);color:var(--gold);}
+/* 무료→유료 upsell */
+.upsell-box{
+  margin:24px 0 8px;padding:20px 16px;
+  background:linear-gradient(135deg,rgba(80,40,10,.45),rgba(40,10,60,.45));
+  border:1px solid rgba(200,160,60,.35);border-radius:14px;
+}
+.upsell-title{font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.upsell-sub{font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:14px;}
+.upsell-list{display:flex;flex-direction:column;gap:10px;}
+.upsell-btn{
+  display:flex;align-items:center;gap:12px;width:100%;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:12px 14px;cursor:pointer;
+  font-family:inherit;color:var(--text);text-align:left;transition:all .2s;
+}
+.upsell-btn:hover{border-color:var(--gold);background:rgba(200,160,60,.08);}
+.upsell-emoji{font-size:1.6rem;flex-shrink:0;}
+.upsell-info{flex:1;font-size:.8rem;line-height:1.5;}
+.upsell-info b{font-size:.88rem;color:var(--gold2);}
+.upsell-info small{color:var(--dim);}
+.upsell-price{font-size:.88rem;font-weight:700;color:var(--gold);white-space:nowrap;}
+/* 보관함 */
+.archive-empty{text-align:center;padding:60px 20px;color:var(--dim);font-size:.88rem;line-height:2;}
+.archive-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;}
+.archive-item:hover{border-color:var(--gold);}
+.archive-item-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.archive-emoji{font-size:1.5rem;}
+.archive-name{font-size:.95rem;font-weight:700;color:var(--gold2);}
+.archive-date{font-size:.72rem;color:var(--dim);margin-left:auto;}
+.archive-q{font-size:.8rem;color:var(--dim);margin-bottom:6px;font-style:italic;}
+.archive-cards{display:flex;gap:6px;flex-wrap:wrap;}
+.archive-card-chip{font-size:.72rem;background:rgba(255,255,255,.06);border-radius:20px;padding:3px 9px;color:var(--text);}
+.archive-expires{font-size:.7rem;color:var(--gold);margin-top:8px;}
+.archive-expired{opacity:.45;pointer-events:none;}
+.archive-notice{background:rgba(80,40,10,.3);border:1px solid rgba(200,160,60,.25);border-radius:10px;padding:12px 14px;font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+/* 후기 */
+.review-write-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px;}
+.review-write-title{font-size:.9rem;font-weight:700;color:var(--gold2);margin-bottom:12px;}
+.review-stars{display:flex;gap:6px;margin-bottom:12px;}
+.star{font-size:1.6rem;color:var(--border);cursor:pointer;transition:color .15s;line-height:1;}
+.star.on{color:#f0c040;}
+.review-textarea{width:100%;min-height:90px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-family:inherit;font-size:.85rem;resize:none;box-sizing:border-box;margin-bottom:12px;}
+.review-textarea:focus{outline:none;border-color:var(--gold);}
+.review-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+.review-item-stars{color:#f0c040;font-size:.9rem;margin-bottom:4px;}
+.review-item-text{font-size:.83rem;color:var(--text);line-height:1.7;}
+.review-item-date{font-size:.7rem;color:var(--dim);margin-top:6px;}
+
+/* ══════════ 페이월 ══════════ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
+  align-items:flex-end;justify-content:center;
+}
+.modal-overlay.show{display:flex;}
+.modal-sheet{
+  background:var(--surface);border-radius:24px 24px 0 0;
+  width:100%;max-width:480px;padding:28px 22px 36px;
+  animation:slideUp .3s ease;max-height:90vh;overflow-y:auto;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px;}
+.sheet-icon{font-size:2.5rem;text-align:center;margin-bottom:10px;}
+.sheet-title{font-size:1.2rem;font-weight:700;text-align:center;margin-bottom:6px;}
+.sheet-desc{color:var(--dim);text-align:center;font-size:.83rem;line-height:1.7;margin-bottom:18px;}
+.price-box{
+  background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);
+  border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;
+}
+.price-big{font-size:1.8rem;font-weight:900;color:var(--gold2);}
+.price-sub{font-size:.75rem;color:var(--dim);margin-top:4px;}
+.btn-pay{
+  width:100%;background:linear-gradient(135deg,var(--pink),#8a2060);
+  color:#fff;border:none;border-radius:14px;
+  padding:15px;font-family:inherit;font-size:1rem;font-weight:700;
+  cursor:pointer;margin-bottom:10px;transition:all .25s;
+}
+.btn-pay:hover{box-shadow:0 0 24px rgba(224,90,154,.4);transform:translateY(-1px);}
+.btn-close-sheet{
+  width:100%;background:transparent;border:1px solid var(--border);
+  color:var(--dim);border-radius:14px;padding:12px;
+  font-family:inherit;font-size:.88rem;cursor:pointer;
+}
+
+/* ══════════ 테스트 결제 ══════════ */
+#test-pay-modal.modal-overlay{align-items:center;justify-content:center;}
+.test-pay-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:30px 24px;max-width:340px;width:90%;text-align:center;
+  animation:fadeUp .3s ease;
+}
+.test-pay-box h3{font-size:1.1rem;font-weight:700;margin-bottom:6px;}
+.test-pay-box p{color:var(--dim);font-size:.82rem;margin-bottom:20px;line-height:1.6;}
+.test-card-wrap{
+  background:linear-gradient(135deg,#2a1060,#1a0040);
+  border-radius:12px;padding:16px;margin-bottom:18px;text-align:left;
+}
+.test-card-label{font-size:.68rem;color:var(--dim);margin-bottom:6px;}
+.test-card-num{font-size:1rem;color:var(--text);letter-spacing:3px;}
+.test-card-row{display:flex;gap:12px;margin-top:8px;}
+.test-card-field{flex:1;}
+.test-loading{display:none;flex-direction:column;align-items:center;gap:12px;padding:10px 0;}
+.spinner{width:36px;height:36px;border:3px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-test-pay{
+  width:100%;background:linear-gradient(135deg,var(--gold),#8a6a20);
+  color:#0a0712;border:none;border-radius:12px;
+  padding:14px;font-family:inherit;font-size:.95rem;font-weight:900;
+  cursor:pointer;margin-bottom:10px;transition:all .25s;
+}
+.btn-test-cancel{
+  width:100%;background:transparent;border:none;
+  color:var(--dim);font-family:inherit;font-size:.82rem;cursor:pointer;
+}
+
+/* ══════════ 관리자 ══════════ */
+#screen-admin{overflow-y:auto;}
+.admin-box{
+  background:var(--surface);
+  width:100%;padding:24px 18px 60px;flex:1;
+}
+.admin-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.admin-top h2{font-size:1.05rem;font-weight:700;color:var(--gold);}
+.admin-close{background:transparent;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;}
+.admin-tabs{display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.admin-tab{
+  padding:8px 14px 10px;border:none;background:transparent;
+  color:var(--dim);font-family:inherit;font-size:.82rem;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.admin-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.admin-section{display:none;}
+.admin-section.active{display:block;}
+
+/* 관리자 공통 */
+.admin-label{font-size:.72rem;color:var(--gold);letter-spacing:1px;margin-bottom:6px;margin-top:14px;display:block;}
+.admin-input,.admin-select,.admin-textarea{
+  width:100%;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:8px;
+  padding:10px 12px;color:var(--text);font-family:inherit;font-size:.85rem;
+  outline:none;transition:border-color .2s;
+}
+.admin-input:focus,.admin-select:focus,.admin-textarea:focus{border-color:var(--gold);}
+.admin-select option{background:#1a0a2e;}
+.admin-textarea{resize:vertical;min-height:70px;line-height:1.5;}
+.admin-row{display:flex;gap:8px;align-items:flex-end;}
+.admin-row .admin-input{flex:1;}
+.a-btn{
+  padding:10px 14px;border-radius:8px;font-family:inherit;font-size:.8rem;
+  cursor:pointer;border:1px solid;white-space:nowrap;transition:all .2s;
+}
+.a-btn-gold{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.4);color:var(--gold);}
+.a-btn-red{background:rgba(200,60,60,.12);border-color:rgba(200,60,60,.4);color:#ffb3b3;}
+.a-btn-green{background:rgba(60,160,60,.12);border-color:rgba(60,160,60,.4);color:#90ee90;}
+.a-btn-blue{background:rgba(60,120,200,.12);border-color:rgba(60,120,200,.4);color:#85c8d8;}
+.a-stat{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.a-stat-lbl{color:var(--dim);font-size:.82rem;}
+.a-stat-val{font-size:.88rem;font-weight:600;}
+.green-txt{color:#90ee90;} .red-txt{color:#ffb3b3;} .blue-txt{color:#85c8d8;} .gold-txt{color:var(--gold);}
+
+/* 상품 관리 카드 */
+.prod-manage-card{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:12px;margin-bottom:10px;
+}
+.pmc-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.pmc-thumb{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.pmc-info{flex:1;}
+.pmc-name{font-size:.88rem;font-weight:700;}
+.pmc-cat{font-size:.7rem;color:var(--dim);}
+.pmc-price{font-size:.85rem;color:var(--gold);font-weight:700;margin-left:auto;}
+.pmc-btns{display:flex;gap:6px;}
+.pmc-btns .a-btn{padding:6px 10px;font-size:.72rem;}
+
+/* 상품 편집 폼 */
+.prod-edit-form{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:12px;padding:16px;margin-bottom:16px;display:none;
+}
+.prod-edit-form.open{display:block;}
+.img-preview{
+  width:80px;height:80px;border-radius:10px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;margin-bottom:6px;overflow:hidden;
+}
+.img-preview img{width:100%;height:100%;object-fit:cover;}
+
+/* 관리자 로그인 */
+#admin-login-form{text-align:center;padding:40px 20px;}
+#admin-login-form h3{color:var(--gold);font-size:1.1rem;margin-bottom:16px;}
+#admin-login-form p{color:var(--dim);font-size:.78rem;margin-top:8px;}
+
+/* 뱃지 */
+.badge-strip{
+  margin:10px 14px;border-radius:10px;padding:9px 14px;
+  display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:500;
+}
+.badge-free{background:rgba(40,130,40,.15);border:1px solid rgba(40,160,40,.25);color:#90ee90;}
+.badge-used{background:rgba(180,40,40,.15);border:1px solid rgba(180,40,40,.3);color:#ffb3b3;}
+.badge-paid{background:rgba(40,100,180,.15);border:1px solid rgba(40,120,200,.3);color:#85c8d8;}
+
+.hidden{display:none!important;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* 카카오 로그인 버튼 */
+.kakao-login-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;
+  background:#FEE500;color:#000;font-size:.95rem;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;margin-bottom:10px;
+}
+.kakao-login-btn img{width:20px;height:20px;}
+.user-info-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;background:rgba(254,229,0,.1);
+  border-bottom:1px solid rgba(254,229,0,.2);
+}
+.user-info-bar img{width:32px;height:32px;border-radius:50%;}
+.user-info-bar .user-name{font-size:.85rem;font-weight:700;color:var(--gold);}
+.user-info-bar .logout-btn{
+  margin-left:auto;font-size:.72rem;color:var(--dim);
+  background:none;border:1px solid var(--border);border-radius:8px;
+  padding:3px 8px;cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="stars-layer"></div>
+
+<div id="app">
+
+<!-- ══ 홈 화면 ══ -->
+<div id="screen-home" class="screen active">
+  <div id="user-info-bar" class="user-info-bar" style="display:none;">
+    <img id="user-avatar" src="" alt="">
+    <span class="user-name" id="user-name-text">회원님</span>
+    <button class="logout-btn" onclick="kakaoLogout()">로그아웃</button>
+  </div>
+  <div class="home-header">
+    <div class="header-logo">
+      <div class="logo-icon"><span class="logo-s">S</span></div>
+      <span>시아타로</span>
+    </div>
+    <div class="header-right">
+      <div class="user-badge" id="user-badge-btn">회원님</div>
+      <button class="menu-btn" onclick="openAdmin()">☰</button>
+    </div>
+  </div>
+
+  <div id="home-badge"></div>
+
+  <div class="banner">
+    <div class="banner-sub" id="banner-sub-el">카드가 당신에게 말을 건네고 있습니다</div>
+    <div class="banner-title" id="banner-title-el">당신의 운명을<br>읽어드립니다</div>
+    <button class="banner-btn" onclick="startFreeReading()">무료로 보기</button>
+    <div class="banner-art">
+      <div class="tarot-card-mini card-left"><div class="star-pattern"></div></div>
+      <div class="tarot-card-mini card-mid"><div class="star-pattern"></div></div>
+      <div class="tarot-card-mini card-right"><div class="star-pattern"></div></div>
+    </div>
+  </div>
+
+  <div class="cat-grid" id="cat-grid"></div>
+
+  <div id="home-footer"></div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="goHome()"><div class="nav-icon">🏠</div><div class="nav-label">홈</div></div>
+    <div class="nav-free-btn" onclick="startFreeReading()">
+      <div class="nav-free-inner">🔮</div>
+      <div class="nav-free-label">무료타로</div>
+    </div>
+    <div class="nav-item" id="nav-admin-btn" style="display:none;" onclick="openAdmin()"><div class="nav-icon">⚙️</div><div class="nav-label">설정</div></div>
+  </div>
+</div>
+
+<!-- ══ 상품 목록 화면 ══ -->
+<div id="screen-products" class="screen">
+  <div class="reading-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <h2 id="products-title">타로 서비스</h2>
+  </div>
+  <div class="products-section">
+    <div class="product-grid" id="product-grid"></div>
+  </div>
+</div>
+
+<!-- ══ 리딩 화면 ══ -->
+<div id="screen-reading" class="screen">
+  <div class="reading-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <h2 id="reading-title">타로 리딩</h2>
+  </div>
+  <div class="reading-body">
+    <div class="q-section">
+      <div class="q-instruction" id="q-instruction">마음속으로 질문을 생각하며<br>신중하게 카드 <b id="q-card-count">3</b>장을 골라주세요</div>
+      <div id="q-text-section" style="display:none;margin-top:12px;">
+        <textarea id="q-text-input" class="q-input" rows="2" placeholder="질문을 입력하세요 (예: 이 사람이 나를 좋아할까?)" style="width:100%;resize:none;border-radius:10px;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.3);color:var(--text);font-family:inherit;font-size:.88rem;outline:none;line-height:1.7;"></textarea>
+      </div>
+    </div>
+    <div class="moving-date-section" id="moving-date-section">
+      <div class="moving-date-label">✦ 비교할 날짜 2개를 선택하세요 ✦</div>
+      <div class="moving-date-row">
+        <input type="date" class="moving-date-input" id="moving-date1">
+        <input type="date" class="moving-date-input" id="moving-date2">
+      </div>
+    </div>
+    <div class="slots-row" id="slots-row"></div>
+    <div class="pick-guide" id="pick-guide">카드를 선택하세요</div>
+    <div class="deck-wrap" id="deck-wrap"></div>
+    <button class="btn-reveal" id="btn-reveal" onclick="showResults()">🌙 카드 펼치기</button>
+  </div>
+</div>
+
+<!-- ══ 결과 화면 ══ -->
+<div id="screen-result" class="screen">
+  <div class="reading-header">
+    <button class="back-btn" onclick="goHome()">✕</button>
+    <h2 id="result-screen-title">타로 결과</h2>
+  </div>
+  <div class="result-body" id="result-body"></div>
+</div>
+
+
+<!-- ══ 페이월 ══ -->
+<div class="modal-overlay" id="paywall">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-icon">🔮</div>
+    <div class="sheet-title" id="pw-title">리딩 서비스</div>
+    <div class="sheet-desc" id="pw-desc">이 서비스를 이용하시려면 결제가 필요합니다.</div>
+    <div class="price-box">
+      <div class="price-big" id="pw-price">₩3,900</div>
+      <div class="price-sub" id="pw-sub">1회 이용</div>
+    </div>
+    <button class="btn-pay" onclick="openTestPay()">✨ 결제하기</button>
+    <button class="btn-close-sheet" onclick="closePaywall()">나중에 하기</button>
+  </div>
+</div>
+
+<!-- ══ 테스트 결제 ══ -->
+<div class="modal-overlay" id="test-pay-modal">
+  <div class="test-pay-box">
+    <div id="test-pay-form">
+      <h3>🧪 테스트 결제</h3>
+      <p>실제 결제 없이 기능을 테스트합니다.<br>앱인토스 연동 후 이 화면이 교체됩니다.</p>
+      <div class="test-card-wrap">
+        <div class="test-card-label">카드 번호 (테스트용)</div>
+        <div class="test-card-num">4242 4242 4242 4242</div>
+        <div class="test-card-row">
+          <div class="test-card-field"><div class="test-card-label">만료</div><div class="test-card-num" style="font-size:.9rem">12/28</div></div>
+          <div class="test-card-field"><div class="test-card-label">CVC</div><div class="test-card-num" style="font-size:.9rem">123</div></div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:.95rem;color:var(--gold);font-weight:700;margin-bottom:16px;" id="test-pay-amount">₩3,900 결제</div>
+      <button class="btn-test-pay" onclick="processTestPay()">결제 승인 (테스트)</button>
+      <button class="btn-test-cancel" onclick="closeTestPay()">취소</button>
+    </div>
+    <div class="test-loading" id="test-pay-loading">
+      <div class="spinner"></div>
+      <div style="color:var(--dim);font-size:.85rem;">결제 처리중...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 관리자 ══ -->
+<div id="screen-admin" class="screen">
+  <div class="admin-box">
+    <div id="admin-login-form">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <button onclick="goHome()" style="background:transparent;border:none;color:var(--dim);font-size:.85rem;cursor:pointer;padding:4px 0;">← 홈으로</button>
+      </div>
+      <h3>🔐 관리자 로그인</h3>
+      <input class="admin-input" type="password" id="admin-pw-input" placeholder="비밀번호 입력" style="text-align:center;letter-spacing:4px;margin-bottom:12px;" onkeydown="if(event.key==='Enter')checkAdminPw()">
+      <button class="a-btn a-btn-gold" style="width:100%;padding:12px;" onclick="checkAdminPw()">로그인</button>
+    </div>
+    <div id="admin-content" class="hidden">
+      <div class="admin-top">
+        <button onclick="goHome()" style="background:transparent;border:none;color:var(--dim);font-size:.85rem;cursor:pointer;padding:4px 0;">← 홈으로</button>
+        <h2>🛠️ 관리자</h2>
+        <button class="admin-close" onclick="closeAdmin()">✕</button>
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('stats',this)">현황</button>
+        <button class="admin-tab" onclick="switchAdminTab('products',this)">상품관리</button>
+        <button class="admin-tab" onclick="switchAdminTab('pay',this)">결제설정</button>
+        <button class="admin-tab" onclick="switchAdminTab('setting',this)">설정</button>
+      </div>
+
+      <!-- 현황 탭 -->
+      <div class="admin-section active" id="tab-stats">
+        <div class="a-stat"><span class="a-stat-lbl">무료 사용 상태</span><span class="a-stat-val" id="st-free">-</span></div>
+        <div class="a-stat"><span class="a-stat-lbl">유료 이용권</span><span class="a-stat-val" id="st-paid">-</span></div>
+        <div class="a-stat"><span class="a-stat-lbl">이용권 만료일</span><span class="a-stat-val" id="st-exp">-</span></div>
+        <div class="a-stat"><span class="a-stat-lbl">총 이용 횟수</span><span class="a-stat-val gold-txt" id="st-count">-</span></div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="a-btn a-btn-red" onclick="adminResetFree()">무료 초기화</button>
+          <button class="a-btn a-btn-green" onclick="adminGrantFree()">무료 1회 지급</button>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          <input class="admin-input" type="number" id="pay-days" value="30" style="width:80px;">
+          <button class="a-btn a-btn-blue" onclick="adminGrantPaid()">N일 유료 지급</button>
+          <button class="a-btn a-btn-red" onclick="adminRevokePaid()">이용권 회수</button>
+        </div>
+      </div>
+
+      <!-- 상품관리 탭 -->
+      <div class="admin-section" id="tab-products">
+        <div id="prod-manage-list"></div>
+        <div class="divider"></div>
+        <button class="a-btn a-btn-gold" style="width:100%;padding:11px;" onclick="openNewProductForm()">＋ 새 상품 추가</button>
+        <div class="prod-edit-form" id="prod-edit-form">
+          <input type="hidden" id="edit-prod-id">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div>
+              <div class="img-preview" id="img-preview-box">🔮</div>
+              <button class="a-btn a-btn-gold" style="font-size:.65rem;padding:4px 8px;" onclick="document.getElementById('img-file-input').click()">이미지 업로드</button>
+              <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImgUpload(this)">
+            </div>
+            <div style="flex:1;">
+              <label class="admin-label" style="margin-top:0;">상품명</label>
+              <input class="admin-input" id="edit-name" placeholder="예: 쓰리카드 타로">
+            </div>
+          </div>
+          <label class="admin-label">이미지 URL (또는 업로드)</label>
+          <input class="admin-input" id="edit-img-url" placeholder="https://... 또는 비워두면 이모지 사용" oninput="updateImgPreviewUrl(this.value)">
+          <label class="admin-label">이모지 아이콘</label>
+          <input class="admin-input" id="edit-emoji" placeholder="🔮" value="🔮" style="font-size:1.3rem;text-align:center;width:80px;">
+          <label class="admin-label">카테고리</label>
+          <select class="admin-select" id="edit-cat">
+            <option value="daily">오늘의 운세</option>
+            <option value="love">연애운</option>
+            <option value="money">재물운</option>
+            <option value="career">진로운</option>
+            <option value="health">건강운</option>
+            <option value="special">프리미엄</option>
+          </select>
+          <label class="admin-label">카드 장수</label>
+          <select class="admin-select" id="edit-cards">
+            <option value="1">원카드 (1장)</option>
+            <option value="3">쓰리카드 (3장)</option>
+            <option value="5">파이브카드 (5장)</option>
+            <option value="7">세븐카드 (7장)</option>
+            <option value="10">텐카드 (10장)</option>
+          </select>
+          <label class="admin-label">가격 (원, 0=무료)</label>
+          <input class="admin-input" id="edit-price" type="number" placeholder="3900">
+          <label class="admin-label">설명</label>
+          <textarea class="admin-textarea" id="edit-desc" placeholder="상품 설명을 입력하세요"></textarea>
+          <label class="admin-label">무료 첫 이용</label>
+          <select class="admin-select" id="edit-free">
+            <option value="false">유료</option>
+            <option value="true">첫 1회 무료</option>
+          </select>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button class="a-btn a-btn-gold" style="flex:1;padding:11px;" onclick="saveProduct()">저장</button>
+            <button class="a-btn a-btn-red" onclick="cancelEditForm()">취소</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 결제설정 탭 -->
+      <div class="admin-section" id="tab-pay">
+        <div class="a-stat"><span class="a-stat-lbl">결제 모드</span><span class="a-stat-val blue-txt">테스트 모드</span></div>
+        <div class="a-stat"><span class="a-stat-lbl">앱인토스 연동</span><span class="a-stat-val red-txt">미연동</span></div>
+        <div class="divider"></div>
+        <label class="admin-label" style="margin-top:0;">앱인토스 API 키</label>
+        <input class="admin-input" id="appintos-key" placeholder="연동 후 키를 입력하세요">
+        <label class="admin-label">결제 성공 후 이동 URL</label>
+        <input class="admin-input" id="pay-callback" placeholder="https://...">
+        <div style="margin-top:14px;background:rgba(40,100,180,.1);border:1px solid rgba(40,100,180,.2);border-radius:8px;padding:12px;font-size:.78rem;color:#85c8d8;line-height:1.7;">
+          ℹ️ 현재 테스트 결제 모드로 동작합니다.<br>앱인토스 입점 후 API 키를 입력하면 실제 결제로 전환됩니다.
+        </div>
+        <button class="a-btn a-btn-gold" style="width:100%;margin-top:12px;padding:11px;" onclick="alert('앱인토스 연동 설정을 저장했습니다. (실제 연동 시 활성화됩니다)')">설정 저장</button>
+      </div>
+
+      <!-- 설정 탭 -->
+      <div class="admin-section" id="tab-setting">
+        <label class="admin-label" style="margin-top:0;">관리자 비밀번호 변경</label>
+        <div class="admin-row">
+          <input class="admin-input" type="password" id="new-pw" placeholder="새 비밀번호 입력">
+          <button class="a-btn a-btn-gold" onclick="adminChangePw()">변경</button>
+        </div>
+        <div class="divider"></div>
+        <label class="admin-label">로고 이미지 URL (선택)</label>
+        <input class="admin-input" id="logo-img-input" placeholder="https://... (비워두면 기본 로고 사용)">
+        <label class="admin-label">앱 이름</label>
+        <input class="admin-input" id="app-name-input" placeholder="시아타로">
+        <label class="admin-label">배너 소제목</label>
+        <input class="admin-input" id="banner-sub-input" placeholder="카드가 당신에게 말을 건네고 있습니다">
+        <label class="admin-label">배너 제목 (줄바꿈 가능)</label>
+        <textarea class="admin-input" id="banner-title-input" rows="3" placeholder="당신의 운명을&#10;읽어드립니다" style="resize:vertical;line-height:1.6;"></textarea>
+        <button class="a-btn a-btn-gold" style="width:100%;margin-top:12px;padding:11px;" onclick="saveSettings()">설정 저장</button>
+        <div class="divider"></div>
+
+        <div style="font-size:.78rem;color:var(--gold);font-weight:600;margin-bottom:8px;">📋 사업자 정보 &amp; 법적 고지</div>
+        <label class="admin-label">상호명</label>
+        <input class="admin-input" id="biz-name" placeholder="예: 시아랩">
+        <label class="admin-label">대표자명</label>
+        <input class="admin-input" id="biz-ceo" placeholder="예: 홍길동">
+        <label class="admin-label">사업자등록번호</label>
+        <input class="admin-input" id="biz-reg" placeholder="예: 123-45-67890">
+        <label class="admin-label">통신판매업 신고번호</label>
+        <input class="admin-input" id="biz-mail" placeholder="예: 제2024-서울강남-1234호">
+        <label class="admin-label">사업장 주소</label>
+        <input class="admin-input" id="biz-addr" placeholder="예: 서울시 강남구 테헤란로 123">
+        <label class="admin-label">이메일</label>
+        <input class="admin-input" id="biz-email" placeholder="예: hello@example.com">
+        <div class="divider" style="margin:14px 0 10px;"></div>
+        <label class="admin-label">이용약관 (내용 입력)</label>
+        <textarea class="admin-input" id="terms-input" rows="5" placeholder="이용약관 내용을 입력하세요." style="resize:vertical;line-height:1.6;font-size:.8rem;"></textarea>
+        <label class="admin-label">개인정보처리방침</label>
+        <textarea class="admin-input" id="privacy-input" rows="5" placeholder="개인정보처리방침 내용을 입력하세요." style="resize:vertical;line-height:1.6;font-size:.8rem;"></textarea>
+        <label class="admin-label">환불·취소 규정</label>
+        <textarea class="admin-input" id="refund-input" rows="4" placeholder="환불 및 취소 규정을 입력하세요." style="resize:vertical;line-height:1.6;font-size:.8rem;"></textarea>
+        <button class="a-btn a-btn-gold" style="width:100%;margin-top:12px;padding:11px;" onclick="saveBizInfo()">사업자·약관 저장</button>
+        <div class="divider"></div>
+        <button class="a-btn a-btn-red" style="width:100%;padding:11px;" onclick="adminResetAll()">⚠️ 전체 초기화 (개발용)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════
+const store = (() => {
+  const mem = {};
+  // localStorage
+  let ls = null;
+  try { ls = window.localStorage; ls.setItem('_t','1'); ls.removeItem('_t'); } catch(e) { ls = null; }
+  // cookie helpers (소형 키용 백업 — admin_pw, app_settings, tarot_free, prod_version 등)
+  function ckSet(k,v){ try{ const d=new Date(); d.setFullYear(d.getFullYear()+1); document.cookie=encodeURIComponent(k)+'='+encodeURIComponent(v)+';expires='+d.toUTCString()+';path=/'; }catch(e){} }
+  function ckGet(k){ try{ const n=encodeURIComponent(k)+'='; for(const c of document.cookie.split(';')){ const t=c.trim(); if(t.startsWith(n)) return decodeURIComponent(t.slice(n.length)); } }catch(e){} return null; }
+  function ckDel(k){ try{ document.cookie=encodeURIComponent(k)+'=;expires=Thu,01 Jan 1970 00:00:00 UTC;path=/'; }catch(e){} }
+  // 쿠키 백업 대상 키 목록 (크기가 작은 것만)
+  const CK_KEYS = new Set(['admin_pw','app_settings','tarot_free','tarot_count','prod_version']);
+  return {
+    get(k){
+      try{ if(ls){ const v=ls.getItem(k); if(v!==null) return v; } }catch(e){}
+      const cv=ckGet(k); if(cv!==null) return cv;
+      return mem[k]??null;
+    },
+    set(k,v){
+      const s=String(v);
+      try{ if(ls) ls.setItem(k,s); }catch(e){}
+      if(CK_KEYS.has(k)) ckSet(k,s);
+      mem[k]=s;
+    },
+    del(k){
+      try{ if(ls) ls.removeItem(k); }catch(e){}
+      if(CK_KEYS.has(k)) ckDel(k);
+      delete mem[k];
+    },
+    getObj(k){ try{ const v=this.get(k); return v?JSON.parse(v):null; }catch(e){ return null; } },
+    setObj(k,v){ this.set(k,JSON.stringify(v)); },
+  };
+})();
+
+// ══════════════════════════════════════════════════════
+// 타로 카드 데이터 (78장)
+// ══════════════════════════════════════════════════════
+function makeMinor(suit,sym,g1,g2,keys,imgs=[]){
+  const nums=["에이스","2","3","4","5","6","7","8","9","10","페이지","나이트","퀸","킹"];
+  const eng={완드:"Wands",컵:"Cups",검:"Swords",펜타클:"Pentacles"}[suit];
+  const baseId={완드:22,컵:36,검:50,펜타클:64}[suit];
+  const ups=["새로운 시작과 에너지가 찾아옵니다. 이 기회를 잡으세요.","두 가지를 조율하는 능력이 필요합니다. 균형을 찾으세요.","초기 성과가 나타납니다. 협력과 소통으로 성장하세요.","안정된 기반을 구축했습니다. 성과를 돌아보고 충전하세요.","도전적인 시기이지만 극복하면 더 단단해집니다.","나눔과 조화로 풍요로움을 경험합니다. 베풀수록 돌아옵니다.","꾸준한 인내가 필요합니다. 멀리 보고 나아가세요.","빠른 진전과 변화가 있습니다. 흐름에 올라타 기회를 잡으세요.","목표에 거의 다 왔습니다. 마지막 힘을 내세요.","하나의 사이클이 완성됩니다. 결실을 맺고 다음을 준비하세요.","새로운 것을 배우는 시기입니다. 호기심을 따르세요.","열정적으로 행동에 나설 때입니다. 추진력을 발휘하세요.","성숙한 지혜와 포용력으로 주변에 좋은 영향을 줍니다.","풍부한 경험과 권위로 목표를 완성합니다."];
+  const revs=["기회를 놓쳤습니다. 시작 전에 점검이 필요합니다.","불균형이 문제입니다. 한 가지에 집중하세요.","계획이 어긋납니다. 소통을 강화하세요.","지나친 안주가 성장을 막습니다. 변화를 두려워하지 마세요.","갈등이 극에 달했습니다. 다시 일어설 힘이 있습니다.","이기심이 문제입니다. 진정성을 찾으세요.","두려움으로 포기하려 합니다. 다시 시작하세요.","기회를 놓치거나 변화를 두려워합니다. 용기를 내세요.","목표 달성이 지연됩니다. 방향이 중요합니다.","과부하 상태입니다. 쉬어가도 괜찮습니다.","배움을 거부합니다. 열린 마음을 가지세요.","성급한 행동이 문제입니다. 계획을 먼저 세우세요.","감정 기복이 관계를 어렵게 합니다. 중심을 잡으세요.","독단적 태도가 주변을 힘들게 합니다."];
+  return Array.from({length:14},(_,i)=>({id:baseId+i,name:`${nums[i]} of ${eng}`,kr:`${suit} ${nums[i]}`,img:imgs[i]||'',symbol:sym,color:`linear-gradient(135deg,${g1},${g2})`,num:nums[i],suit,upright:ups[i],reversed:revs[i],keys}));
+}
+// 라이더-웨이트 덱 이미지 (퍼블릭 도메인, Wikimedia Commons Special:FilePath)
+// Special:FilePath는 해시 없이 파일명만으로 이미지를 직접 서빙하는 Wikimedia 공식 URL
+const WFP = 'https://commons.wikimedia.org/wiki/Special:FilePath/';
+const MAJOR_NAMES = [
+  'RWS_Tarot_00_Fool.jpg','RWS_Tarot_01_Magician.jpg','RWS_Tarot_02_High_Priestess.jpg',
+  'RWS_Tarot_03_Empress.jpg','RWS_Tarot_04_Emperor.jpg','RWS_Tarot_05_Hierophant.jpg',
+  'RWS_Tarot_06_Lovers.jpg','RWS_Tarot_07_Chariot.jpg','RWS_Tarot_08_Strength.jpg',
+  'RWS_Tarot_09_Hermit.jpg','RWS_Tarot_10_Wheel_of_Fortune.jpg','RWS_Tarot_11_Justice.jpg',
+  'RWS_Tarot_12_Hanged_Man.jpg','RWS_Tarot_13_Death.jpg','RWS_Tarot_14_Temperance.jpg',
+  'RWS_Tarot_15_Devil.jpg','RWS_Tarot_16_Tower.jpg','RWS_Tarot_17_Star.jpg',
+  'RWS_Tarot_18_Moon.jpg','RWS_Tarot_19_Sun.jpg','RWS_Tarot_20_Judgement.jpg',
+  'RWS_Tarot_21_World.jpg'
+];
+const MAJOR_IMG = MAJOR_NAMES.map(n=>`${WFP}${n}`);
+// 마이너 아르카나 — Wikimedia Commons 실제 파일명
+const WAND_IMG = Array.from({length:14},(_,i)=>`${WFP}Wands${String(i+1).padStart(2,'0')}.jpg`);
+const CUP_IMG  = Array.from({length:14},(_,i)=>`${WFP}Cups${String(i+1).padStart(2,'0')}.jpg`);
+const SWD_IMG  = Array.from({length:14},(_,i)=>`${WFP}Swords${String(i+1).padStart(2,'0')}.jpg`);
+const PEN_IMG  = Array.from({length:14},(_,i)=>`${WFP}Pents${String(i+1).padStart(2,'0')}.jpg`);
+
+const TAROT=[
+  {id:0,name:"The Fool",kr:"광대",img:MAJOR_IMG[0],symbol:"🃏",color:"linear-gradient(135deg,#2a4a8a,#0a1a4a)",num:"0",suit:"메이저",upright:"새로운 시작과 모험이 기다립니다. 두려움을 내려놓고 직감을 믿으세요.",reversed:"무모하거나 준비 없이 뛰어드는 것을 조심하세요.",keys:["새출발","자유","모험","순수"]},
+  {id:1,name:"The Magician",kr:"마법사",img:MAJOR_IMG[1],symbol:"⚡",color:"linear-gradient(135deg,#8a2a2a,#4a0a0a)",num:"Ⅰ",suit:"메이저",upright:"당신은 목표를 이룰 모든 능력을 갖추고 있습니다. 의지로 창조하세요.",reversed:"재능을 발휘 못하거나 속임수를 조심하세요.",keys:["능력","의지","창조","집중"]},
+  {id:2,name:"High Priestess",kr:"여사제",img:MAJOR_IMG[2],symbol:"🌙",color:"linear-gradient(135deg,#1a2a6a,#080a2a)",num:"Ⅱ",suit:"메이저",upright:"내면의 목소리에 귀 기울이세요. 직관이 답을 알려줄 것입니다.",reversed:"중요한 정보가 숨겨져 있습니다. 직관을 믿으세요.",keys:["직관","내면","신비","지혜"]},
+  {id:3,name:"The Empress",kr:"여황제",img:MAJOR_IMG[3],symbol:"🌸",color:"linear-gradient(135deg,#4a2a6a,#2a0a3a)",num:"Ⅲ",suit:"메이저",upright:"풍요와 창의성이 가득합니다. 자연의 흐름에 맡기면 결실을 맺습니다.",reversed:"창의성이 막히거나 지나친 의존이 문제입니다.",keys:["풍요","창의","번영","모성"]},
+  {id:4,name:"The Emperor",kr:"황제",img:MAJOR_IMG[4],symbol:"🏛️",color:"linear-gradient(135deg,#6a2a0a,#3a0a00)",num:"Ⅳ",suit:"메이저",upright:"체계와 리더십으로 안정을 구축할 때입니다. 책임감이 성공을 이끕니다.",reversed:"지나친 통제가 관계를 해칩니다. 유연함이 필요합니다.",keys:["권위","안정","리더십","구조"]},
+  {id:5,name:"The Hierophant",kr:"교황",img:MAJOR_IMG[5],symbol:"⛪",color:"linear-gradient(135deg,#3a1a6a,#1a0a3a)",num:"Ⅴ",suit:"메이저",upright:"전통과 검증된 지혜가 길을 안내합니다. 신뢰할 수 있는 조언을 따르세요.",reversed:"기존 규범에 의문을 품고 자신만의 길을 찾을 때입니다.",keys:["전통","관습","지도","도덕"]},
+  {id:6,name:"The Lovers",kr:"연인",img:MAJOR_IMG[6],symbol:"💕",color:"linear-gradient(135deg,#8a1a3a,#4a0a1a)",num:"Ⅵ",suit:"메이저",upright:"깊은 사랑과 조화로운 연결이 찾아옵니다. 가치관이 일치하는 선택을 하세요.",reversed:"관계의 갈등이나 가치관 충돌이 있습니다.",keys:["사랑","조화","선택","연결"]},
+  {id:7,name:"The Chariot",kr:"전차",img:MAJOR_IMG[7],symbol:"🔥",color:"linear-gradient(135deg,#2a5a8a,#0a2a5a)",num:"Ⅶ",suit:"메이저",upright:"강한 의지로 장애물을 극복하고 승리가 눈앞에 있습니다.",reversed:"방향을 잃었거나 자제력이 부족합니다.",keys:["승리","의지","전진","통제"]},
+  {id:8,name:"Strength",kr:"힘",img:MAJOR_IMG[8],symbol:"🦁",color:"linear-gradient(135deg,#8a6a0a,#4a3a00)",num:"Ⅷ",suit:"메이저",upright:"부드러운 방식으로도 강함을 발휘할 수 있습니다. 용기로 두려움을 극복하세요.",reversed:"자기 의심이 행동을 방해합니다.",keys:["용기","인내","강함","자제"]},
+  {id:9,name:"The Hermit",kr:"은둔자",img:MAJOR_IMG[9],symbol:"🕯️",color:"linear-gradient(135deg,#2a3a4a,#0a1a2a)",num:"Ⅸ",suit:"메이저",upright:"혼자만의 성찰을 통해 깊은 지혜를 얻을 때입니다.",reversed:"지나친 고립이 문제입니다. 도움을 요청해도 괜찮습니다.",keys:["성찰","고독","지혜","내면"]},
+  {id:10,name:"Wheel of Fortune",kr:"운명의 수레바퀴",img:MAJOR_IMG[10],symbol:"☸️",color:"linear-gradient(135deg,#4a4a0a,#2a2a00)",num:"Ⅹ",suit:"메이저",upright:"삶이 새로운 방향으로 전환됩니다. 변화와 행운을 받아들이세요.",reversed:"변화에 저항하거나 불운한 시기입니다.",keys:["변화","행운","운명","전환"]},
+  {id:11,name:"Justice",kr:"정의",img:MAJOR_IMG[11],symbol:"⚖️",color:"linear-gradient(135deg,#0a4a4a,#002a2a)",num:"Ⅺ",suit:"메이저",upright:"공정한 결과가 내려집니다. 진실은 결국 드러납니다.",reversed:"불공정한 상황이나 책임 회피가 문제입니다.",keys:["공정","진실","균형","법칙"]},
+  {id:12,name:"The Hanged Man",kr:"매달린 사람",img:MAJOR_IMG[12],symbol:"🌿",color:"linear-gradient(135deg,#1a4a2a,#0a2a0a)",num:"Ⅻ",suit:"메이저",upright:"잠시 멈추고 다른 각도로 바라보세요. 기다림이 더 큰 깨달음을 줍니다.",reversed:"불필요한 희생이나 기다림을 멈추세요.",keys:["희생","기다림","관점","전환"]},
+  {id:13,name:"Death",kr:"죽음",img:MAJOR_IMG[13],symbol:"🌑",color:"linear-gradient(135deg,#1a1a2a,#050508)",num:"ⅩⅢ",suit:"메이저",upright:"끝이 있어야 새로운 시작이 옵니다. 변화를 받아들이세요.",reversed:"끝나야 할 것을 붙들고 있습니다.",keys:["변환","끝","시작","변화"]},
+  {id:14,name:"Temperance",kr:"절제",img:MAJOR_IMG[14],symbol:"🌊",color:"linear-gradient(135deg,#0a3a5a,#001a3a)",num:"ⅩⅣ",suit:"메이저",upright:"균형과 인내가 결실을 맺습니다. 서두르지 않고 조화롭게 나아가세요.",reversed:"지나침이나 불균형이 문제를 일으킵니다.",keys:["균형","인내","조화","절제"]},
+  {id:15,name:"The Devil",kr:"악마",img:MAJOR_IMG[15],symbol:"⛓️",color:"linear-gradient(135deg,#2a0a0a,#100005)",num:"ⅩⅤ",suit:"메이저",upright:"스스로 만든 속박에서 벗어날 용기를 내세요.",reversed:"집착에서 벗어나고 자유를 되찾는 시기입니다.",keys:["집착","속박","물질","중독"]},
+  {id:16,name:"The Tower",kr:"탑",img:MAJOR_IMG[16],symbol:"🌩️",color:"linear-gradient(135deg,#5a1a0a,#2a0500)",num:"ⅩⅥ",suit:"메이저",upright:"갑작스러운 변화가 찾아옵니다. 무너지는 것은 재건을 위한 과정입니다.",reversed:"큰 충격을 피했지만 변화는 결국 찾아옵니다.",keys:["변화","붕괴","각성","충격"]},
+  {id:17,name:"The Star",kr:"별",img:MAJOR_IMG[17],symbol:"⭐",color:"linear-gradient(135deg,#1a2a5a,#080a30)",num:"ⅩⅦ",suit:"메이저",upright:"희망과 치유의 빛이 찾아옵니다. 믿음을 유지하면 반드시 나아집니다.",reversed:"희망을 잃지 마세요. 작은 빛에 집중하면 길이 보입니다.",keys:["희망","영감","치유","믿음"]},
+  {id:18,name:"The Moon",kr:"달",img:MAJOR_IMG[18],symbol:"🌕",color:"linear-gradient(135deg,#1a1a4a,#080815)",num:"ⅩⅧ",suit:"메이저",upright:"표면 아래 숨겨진 진실이 있습니다. 불안 속에서도 직관을 믿으세요.",reversed:"안개가 걷히고 상황이 명확해집니다.",keys:["환상","무의식","두려움","신비"]},
+  {id:19,name:"The Sun",kr:"태양",img:MAJOR_IMG[19],symbol:"☀️",color:"linear-gradient(135deg,#7a5a00,#3a2a00)",num:"ⅩⅨ",suit:"메이저",upright:"밝고 긍정적인 에너지로 가득한 최고의 시기입니다.",reversed:"성공이 잠시 지연됩니다. 곧 밝은 시기가 올 것입니다.",keys:["성공","기쁨","활력","긍정"]},
+  {id:20,name:"Judgement",kr:"심판",img:MAJOR_IMG[20],symbol:"📯",color:"linear-gradient(135deg,#3a2a6a,#1a0a3a)",num:"ⅩⅩ",suit:"메이저",upright:"중요한 각성과 새로운 소명이 찾아옵니다. 내면의 부름에 응답하세요.",reversed:"변화를 두려워하며 과거에 머물고 있습니다.",keys:["각성","갱신","부활","소명"]},
+  {id:21,name:"The World",kr:"세계",img:MAJOR_IMG[21],symbol:"🌍",color:"linear-gradient(135deg,#0a4a2a,#002a10)",num:"ⅩⅪ",suit:"메이저",upright:"완성과 성취의 기쁨입니다. 새로운 사이클이 열립니다.",reversed:"아직 미완성입니다. 마무리를 위한 노력이 더 필요합니다.",keys:["완성","성취","통합","완전"]},
+  ...makeMinor("완드","🔥","#6a2a00","#2a0800",["열정","창의","야망","행동"],WAND_IMG),
+  ...makeMinor("컵","💧","#0a2a6a","#03093a",["감정","관계","직관","꿈"],CUP_IMG),
+  ...makeMinor("검","💨","#1a3a2a","#061008",["지성","갈등","진실","결단"],SWD_IMG),
+  ...makeMinor("펜타클","🌿","#2a4a0a","#0c1800",["물질","현실","건강","풍요"],PEN_IMG),
+];
+
+// ══════════════════════════════════════════════════════
+// 기본 상품 데이터
+// ══════════════════════════════════════════════════════
+const DEFAULT_PRODUCTS = [
+  // ── 오늘의 운세 ──
+  {id:'p1', name:'오늘의 운세',
+   desc:'지금 이 순간, 카드 한 장이 오늘 하루의 에너지와 흐름을 전합니다. 어떤 마음가짐으로 하루를 시작해야 할지, 무엇을 조심하고 무엇에 집중해야 할지 카드가 솔직하게 알려드립니다.',
+   category:'daily', cards:1, price:0, freeFirst:false, emoji:'☀️', imgUrl:'', color:'linear-gradient(135deg,#3a1060,#6a2fa0)'},
+
+  // ── 연애운 ──
+  {id:'p2', name:'연애운',
+   desc:'솔로라면 언제 어떤 인연이 다가오는지, 연인이 있다면 지금 우리 관계의 흐름과 앞으로의 방향을 카드가 세밀하게 짚어드립니다. 사랑에 관한 궁금증을 마음속에 품고 카드를 선택하세요.',
+   category:'love', cards:3, price:4900, freeFirst:false, emoji:'💕', imgUrl:'', color:'linear-gradient(135deg,#6a0a3a,#3a0020)', hasQuestion:true},
+  {id:'p3', name:'짝사랑운',
+   desc:'마음속에 담아둔 그 사람, 나의 감정이 전해지고 있을까요? 상대가 나를 어떻게 느끼는지, 이 감정이 실제 연애로 이어질 가능성은 있는지 카드가 현실적으로 분석해드립니다.',
+   category:'love', cards:3, price:4900, freeFirst:false, emoji:'💘', imgUrl:'', color:'linear-gradient(135deg,#5a0a3a,#2a0018)', hasQuestion:true},
+  {id:'p4', name:'재회운',
+   desc:'헤어진 그 사람과 다시 이어질 수 있을까요? 상대의 현재 마음 상태, 재회 가능성, 그리고 만약 다시 만난다면 어떤 방향으로 흘러갈지 카드가 솔직하게 답해드립니다.',
+   category:'love', cards:3, price:4900, freeFirst:false, emoji:'🌹', imgUrl:'', color:'linear-gradient(135deg,#4a0a2a,#200010)', hasQuestion:true},
+  {id:'p5', name:'상대 속마음',
+   desc:'그 사람은 지금 나를 어떻게 생각하고 있을까요? 말로 표현하지 못한 진심, 겉으로 드러나지 않는 감정까지 타로 카드가 상대방의 내면을 깊이 들여다봐 드립니다.',
+   category:'love', cards:3, price:4900, freeFirst:false, emoji:'💭', imgUrl:'', color:'linear-gradient(135deg,#4a0a4a,#1a0020)', hasQuestion:true},
+
+  // ── 재물운 ──
+  {id:'p6', name:'금전운',
+   desc:'지금 내 돈의 흐름은 어떤가요? 단기적인 수입·지출 에너지, 예상치 못한 지출이나 횡재의 기운, 그리고 이번 달 금전적으로 주의해야 할 포인트를 카드로 짚어드립니다.',
+   category:'money', cards:3, price:4900, freeFirst:false, emoji:'💵', imgUrl:'', color:'linear-gradient(135deg,#1a4a0a,#0a2000)'},
+  {id:'p7', name:'재물운',
+   desc:'투자·저축·부동산·사업 수익 등 중장기적인 재물 에너지를 분석합니다. 돈이 쌓이는 시기와 조심해야 할 시기, 지금 내가 집중해야 할 재물 전략까지 다섯 장 카드로 깊이 읽어드립니다.',
+   category:'money', cards:5, price:4900, freeFirst:false, emoji:'💰', imgUrl:'', color:'linear-gradient(135deg,#2a4a0a,#0c1800)'},
+
+  // ── 진로운 ──
+  {id:'p8', name:'적성운',
+   desc:'내가 진짜 잘할 수 있는 것은 무엇일까요? 타고난 재능과 숨겨진 가능성, 어떤 분야에서 빛을 발할 수 있는지 카드가 내면 깊은 곳의 답을 꺼내드립니다.',
+   category:'career', cards:3, price:4900, freeFirst:false, emoji:'🧭', imgUrl:'', color:'linear-gradient(135deg,#0a4a3a,#002a1a)'},
+  {id:'p9', name:'직업운',
+   desc:'현재 직장에서의 위치와 평판, 승진·이직·갈등의 흐름을 카드로 살펴봅니다. 지금 내가 직장에서 어떤 에너지를 받고 있는지, 앞으로 어떻게 대처해야 할지 방향을 잡아드립니다.',
+   category:'career', cards:3, price:4900, freeFirst:false, emoji:'💼', imgUrl:'', color:'linear-gradient(135deg,#0a3a4a,#001a2a)'},
+  {id:'p10', name:'취업·이직운',
+   desc:'합격 가능성은 얼마나 될까요? 지원한 곳 또는 준비 중인 방향이 나에게 맞는지, 언제 기회가 오는지, 어떤 준비가 더 필요한지 다섯 장 카드가 전략적으로 분석해드립니다.',
+   category:'career', cards:5, price:4900, freeFirst:false, emoji:'🎯', imgUrl:'', color:'linear-gradient(135deg,#1a3a0a,#0a1a00)', hasQuestion:true},
+  {id:'p10b', name:'사업운',
+   desc:'지금 내 사업의 흐름은 어떤가요? 사업 에너지의 방향, 매출과 성장의 기운, 파트너십이나 거래처와의 관계, 주의해야 할 리스크까지 다섯 장 카드로 현실적인 사업 방향을 짚어드립니다.',
+   category:'career', cards:5, price:4900, freeFirst:false, emoji:'🏢', imgUrl:'', color:'linear-gradient(135deg,#2a1a0a,#100800)', hasQuestion:true},
+
+  // ── 건강운 ──
+  {id:'p11', name:'건강운',
+   desc:'몸과 마음의 에너지 상태를 카드로 점검합니다. 지금 특별히 주의해야 할 부분은 어디인지, 스트레스와 피로가 어떤 방향으로 흐르고 있는지, 회복을 위해 무엇이 필요한지 알려드립니다.',
+   category:'health', cards:3, price:4900, freeFirst:false, emoji:'🌿', imgUrl:'', color:'linear-gradient(135deg,#0a4a2a,#001a10)'},
+
+  // ── 프리미엄 ──
+  {id:'p17', name:'프리미엄 풀리딩',
+   desc:'연애·재물·진로·건강·성격 전 영역을 열 장 카드로 완전 분석합니다. 인생의 큰 흐름과 지금 당신에게 가장 중요한 메시지까지, 가장 깊고 정확한 종합 심층 리딩입니다.',
+   category:'special', cards:10, price:19900, freeFirst:false, emoji:'🔮', imgUrl:'', color:'linear-gradient(135deg,#2a0a4a,#100020)'},
+];
+
+function getProducts(){return store.getObj('products')||DEFAULT_PRODUCTS;}
+function saveProducts(p){store.setObj('products',p);}
+
+// ══════════════════════════════════════════════════════
+// 상태
+// ══════════════════════════════════════════════════════
+const SPREADS={
+  1:{positions:["현재 상황"]},
+  3:{positions:["과거","현재","미래"]},
+  5:{positions:["현재 상황","장애물","과거 영향","조언","결과"]},
+  6:{positions:["현재 상황","과거 영향","가까운 미래","장애물","조언","최종 결과"]},
+  7:{positions:["현재 상황","장애물","잠재의식","과거 영향","가까운 미래","외부환경","최종 결과"]},
+  10:{positions:["현재 상황","장애물","잠재의식","과거 영향","가능한 미래","가까운 미래","자신","외부환경","희망·두려움","최종 결과"]},
+};
+let currentProduct=null, avail=[], drawn=[], picked=0, currentCat='daily';
+
+// ══════════════════════════════════════════════════════
+// 유틸
+// ══════════════════════════════════════════════════════
+const $=id=>document.getElementById(id);
+function isFreePending(){return store.get('tarot_free')!=='true';}
+function isPaidFor(id){return store.get('paid_'+id)==='true';}
+function canUse(prod){
+  if(prod.freeFirst) return isFreePending(); // 무료 첫 1회 — 사용 후 불가
+  if(prod.price===0) return true;            // 진짜 무료 상품
+  return isPaidFor(prod.id);                 // 결제 완료 상품
+}
+function incCount(){store.set('tarot_count',String(parseInt(store.get('tarot_count')||'0')+1));}
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+
+function setScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo({top:0});
+  // 홈이 아닌 화면으로 갈 때 히스토리 추가 → 폰 뒤로가기 시 홈으로
+  if(id !== 'screen-home'){
+    history.pushState({screen:id}, '', location.href);
+  }
+}
+window.addEventListener('popstate', function(){
+  goHome();
+});
+
+// ══════════════════════════════════════════════════════
+// 홈 렌더
+// ══════════════════════════════════════════════════════
+const CAT_META = [
+  {cat:'daily', emoji:'☀️', name:'오늘의 운세', desc:'오늘 하루의 에너지와 흐름', color:'linear-gradient(135deg,#3a1060,#6a2fa0)'},
+  {cat:'love',  emoji:'💕', name:'연애운',      desc:'짝사랑·재회·상대 속마음까지', color:'linear-gradient(135deg,#6a0a3a,#3a0020)'},
+  {cat:'money', emoji:'💰', name:'재물운',      desc:'금전 흐름과 재물·투자 운세', color:'linear-gradient(135deg,#1a4a0a,#0a2000)'},
+  {cat:'career',emoji:'💼', name:'진로운',      desc:'적성·직업·취업 이직 방향', color:'linear-gradient(135deg,#0a3a4a,#001a2a)'},
+  {cat:'health',emoji:'🌿', name:'건강운',      desc:'몸과 마음의 에너지 상태', color:'linear-gradient(135deg,#0a4a2a,#001a10)'},
+  {cat:'special',emoji:'🔮',name:'프리미엄',   desc:'성격·전체 운세 심층 리딩', color:'linear-gradient(135deg,#2a0a4a,#100020)'},
+];
+
+function renderHome(){
+  updateBadge();
+  const grid = $('cat-grid');
+  if(!grid) return;
+  grid.innerHTML = CAT_META.map(m=>`
+    <div class="cat-card" style="background:${m.color};" onclick="openCategory('${m.cat}')">
+      <div class="cat-card-emoji">${m.emoji}</div>
+      <div class="cat-card-name">${m.name}</div>
+      <div class="cat-card-desc">${m.desc}</div>
+      <div class="cat-card-arrow">›</div>
+    </div>
+  `).join('');
+}
+
+function openCategory(cat){
+  currentCat = cat;
+  const meta = CAT_META.find(m=>m.cat===cat)||{name:cat};
+  const titleEl = $('products-title');
+  if(titleEl) titleEl.textContent = meta.emoji+' '+meta.name;
+  renderProducts();
+  setScreen('screen-products');
+}
+
+function updateBadge(){
+  const b=$('home-badge');
+  if(isFreePending()){
+    b.innerHTML=`<div class="badge-strip badge-free">✨ 원카드 무료 1회 이용 가능합니다</div>`;
+  } else {
+    b.innerHTML=`<div class="badge-strip badge-used">🔮 원하는 서비스를 선택하고 심층 리딩을 받아보세요.</div>`;
+  }
+}
+
+function renderProducts(){
+  const prods=getProducts().filter(p=>{
+    return p.category===currentCat;
+  });
+  const grid=$('product-grid');
+  grid.innerHTML=prods.map(p=>{
+    const isFreeTag=p.freeFirst&&isFreePending();
+    const priceLabel=p.price===0?'무료':isFreeTag?'첫 1회 무료':formatPrice(p.price);
+    const priceClass=p.price===0||isFreeTag?'free-price':'';
+    const thumbContent=p.imgUrl
+      ?`<img src="${p.imgUrl}" onerror="this.style.display='none'">`
+      :`<div class="thumb-emoji">${p.emoji}</div>`;
+    return `<div class="product-card" onclick="buyProduct('${p.id}')">
+      <div class="product-thumb" style="background:${p.color}">
+        ${thumbContent}
+        ${isFreeTag?'<div class="free-tag">무료</div>':''}
+      </div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-bottom">
+          <div class="product-price ${priceClass}">${priceLabel}</div>
+          <button class="btn-apply">리딩 신청</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatPrice(p){return p===0?'무료':`${p.toLocaleString('ko-KR')}원`;}
+
+
+// ══════════════════════════════════════════════════════
+// 상품 구매 진입
+// ══════════════════════════════════════════════════════
+function startFreeReading(){
+  const prods=getProducts();
+  const free=prods.find(p=>p.freeFirst);
+  if(free)buyProduct(free.id);
+}
+
+function buyProduct(id){
+  const prod=getProducts().find(p=>p.id===id);
+  if(!prod)return;
+  currentProduct=prod;
+
+  if(prod.price===0&&!prod.freeFirst){startReading(prod);return;} // 진짜 무료
+  if(prod.freeFirst&&isFreePending()){startReading(prod);return;} // 무료 1회
+  if(isPaidFor(prod.id)){startReading(prod);return;}              // 결제 완료
+
+  // 페이월
+  $('pw-title').textContent=prod.name;
+  $('pw-desc').textContent=prod.desc;
+  $('pw-price').textContent=formatPrice(prod.price);
+  $('pw-sub').textContent='1회 이용';
+  $('paywall').classList.add('show');
+}
+
+function closePaywall(){$('paywall').classList.remove('show');}
+
+// ══════════════════════════════════════════════════════
+// 테스트 결제
+// ══════════════════════════════════════════════════════
+function openTestPay(){
+  closePaywall();
+  $('test-pay-amount').textContent=`${formatPrice(currentProduct?.price||0)} 결제`;
+  $('test-pay-form').style.display='block';
+  $('test-pay-loading').style.display='none';
+  $('test-pay-modal').classList.add('show');
+}
+
+function closeTestPay(){$('test-pay-modal').classList.remove('show');}
+
+function processTestPay(){
+  $('test-pay-form').style.display='none';
+  $('test-pay-loading').style.display='flex';
+  setTimeout(()=>{
+    closeTestPay();
+    // 결제 성공 → 해당 상품 1회 이용권 부여 (테스트)
+    if(currentProduct)store.set('paid_'+currentProduct.id,'true');
+    updateBadge();
+    alert(`✅ 테스트 결제 완료!\n${formatPrice(currentProduct?.price||0)} 결제 승인\n(앱인토스 연동 후 실제 결제로 교체됩니다)`);
+    if(currentProduct)startReading(currentProduct);
+  },2000);
+}
+
+// ══════════════════════════════════════════════════════
+// 리딩 시작
+// ══════════════════════════════════════════════════════
+function startReading(prod){
+  currentProduct=prod;
+  avail=Array.from({length:78},(_,i)=>i);
+  shuffleArr(avail);
+  drawn=[];picked=0;
+
+  $('reading-title').textContent=prod.name;
+
+  // 안내 문구에 카드 수 표시
+  const qci=$('q-card-count'); if(qci) qci.textContent=prod.cards;
+
+  // 질문 타로이면 텍스트 입력란 표시
+  const qts=$('q-text-section');
+  if(qts){
+    qts.style.display=prod.hasQuestion?'block':'none';
+    const qti=$('q-text-input'); if(qti) qti.value='';
+  }
+
+  // 택일운이면 날짜 입력 노출
+  const mds=$('moving-date-section');
+  if(mds){
+    const isMoving=/이사|택일/.test(prod.name);
+    mds.classList.toggle('show', isMoving);
+    const d1=$('moving-date1'),d2=$('moving-date2');
+    if(d1) d1.value=''; if(d2) d2.value='';
+  }
+
+  // 슬롯 — prod.cards 수 만큼 생성 (안전 폴백 포함)
+  const sp=SPREADS[prod.cards]||SPREADS[Math.min(prod.cards,7)]||SPREADS[3]||SPREADS[1];
+  $('slots-row').innerHTML=sp.positions.map((pos,i)=>`
+    <div class="slot-item">
+      <div class="slot-lbl">${pos}</div>
+      <div class="slot-box" id="sb-${i}">✦</div>
+    </div>`).join('');
+
+  $('pick-guide').textContent=`카드를 ${prod.cards}장 선택하세요`;
+
+  // 덱
+  const wrap=$('deck-wrap');
+  wrap.innerHTML=avail.map((_,i)=>`<div class="deck-c" data-idx="${i}"></div>`).join('');
+  wrap.querySelectorAll('.deck-c').forEach(c=>c.addEventListener('click',()=>pickCard(c)));
+
+  $('btn-reveal').style.display='none';
+  setScreen('screen-reading');
+}
+
+function pickCard(el){
+  if(el.classList.contains('used'))return;
+  if(!currentProduct||picked>=currentProduct.cards)return;
+
+  const ci=avail[parseInt(el.dataset.idx)];
+  const rev=Math.random()<0.35;
+  drawn.push({ci,rev,slot:picked});
+  el.classList.add('used');
+
+  const c=TAROT[ci];
+  const sb=$(`sb-${picked}`);
+  sb.classList.add('filled');
+  sb.innerHTML=`<div class="mini-face" style="background:${c.color};transform:${rev?'rotate(180deg)':'none'}">
+    <div class="mini-sym">${c.symbol}</div>
+    <div class="mini-suit">${c.suit}</div>
+  </div>`;
+
+  picked++;
+  const total=currentProduct.cards;
+  if(picked===total){
+    $('pick-guide').textContent='✨ 카드를 모두 선택했습니다!';
+    $('btn-reveal').style.display='block';
+  } else {
+    $('pick-guide').textContent=`카드를 ${total-picked}장 더 선택하세요`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// 결과
+// ══════════════════════════════════════════════════════
+// 카드 위치별 맥락 문장
+function posContext(pos, cardName, rev) {
+  const ctx = {
+    '과거': rev
+      ? `과거의 흔적인 <b>${cardName}</b>는 역방향으로 나타났습니다. 이는 과거에 충분히 해소되지 못한 감정이나 미완의 과제가 현재에도 영향을 주고 있음을 암시합니다. 그 경험이 아직 당신 내면에서 완전히 정리되지 않았을 수 있습니다.`
+      : `과거의 흐름을 나타내는 <b>${cardName}</b>가 정방향으로 등장했습니다. 이 에너지는 지금까지의 여정에서 당신이 쌓아온 힘과 경험을 상징합니다. 과거의 선택들이 현재 당신의 기반이 되었음을 기억하세요.`,
+    '현재': rev
+      ? `현재 상황을 나타내는 <b>${cardName}</b>가 역방향으로 나타났습니다. 지금 이 순간 에너지가 막히거나 방향성을 잃은 느낌이 들 수 있습니다. 무리하게 앞으로 나아가기보다 잠시 멈추고 내면을 살피는 시간이 필요합니다.`
+      : `현재 상황을 나타내는 <b>${cardName}</b>가 정방향으로 등장했습니다. 지금 당신이 서 있는 자리에서 이 에너지가 강하게 흐르고 있습니다. 현재의 흐름을 잘 읽고 그 힘을 최대한 활용하는 것이 중요합니다.`,
+    '미래': rev
+      ? `미래의 가능성을 보여주는 <b>${cardName}</b>가 역방향으로 나타났습니다. 이는 특정 장애물이나 지연이 예상되지만, 미리 대비한다면 충분히 넘어설 수 있는 과제임을 의미합니다. 두려워하기보다 준비의 신호로 받아들이세요.`
+      : `미래의 흐름을 나타내는 <b>${cardName}</b>가 정방향으로 등장했습니다. 앞으로의 여정에 이 카드의 에너지가 함께할 것입니다. 카드가 제시하는 방향으로 한 걸음씩 나아간다면 좋은 결과를 맞이할 수 있을 것입니다.`,
+    '현재 상황': rev
+      ? `현재 당신의 상황을 보여주는 <b>${cardName}</b>가 역방향으로 나타났습니다. 지금 에너지의 흐름이 원활하지 않거나 억눌린 감정이 있을 수 있습니다. 억지로 해결하려 하기보다 스스로를 돌보는 것이 먼저입니다.`
+      : `현재 당신의 상황을 보여주는 <b>${cardName}</b>가 정방향으로 등장했습니다. 이 카드는 지금 당신이 처한 환경과 내면의 상태를 고스란히 반영합니다. 현재의 에너지를 잘 활용하면 원하는 방향으로 나아갈 수 있습니다.`,
+    '장애물': rev
+      ? `장애물을 나타내는 <b>${cardName}</b>가 역방향으로 나왔습니다. 겉으로는 큰 문제처럼 보이는 것이 사실 당신 내면의 두려움이나 선입견에서 비롯된 것일 수 있습니다. 시각을 달리하면 장애물의 크기가 줄어들 것입니다.`
+      : `장애물을 나타내는 <b>${cardName}</b>가 정방향으로 등장했습니다. 이 카드는 현재 당신의 앞을 가로막는 실질적인 도전을 나타냅니다. 그러나 이 장애물은 당신을 더 단단하게 만들기 위해 등장한 것임을 기억하세요.`,
+    '과거 영향': rev
+      ? `과거의 영향을 보여주는 <b>${cardName}</b>가 역방향으로 나타났습니다. 지난 경험 중 아직 해소되지 않은 감정이나 패턴이 현재에 그림자를 드리우고 있을 수 있습니다. 그 뿌리를 직면하고 놓아주는 용기가 필요합니다.`
+      : `과거의 영향을 나타내는 <b>${cardName}</b>가 정방향으로 등장했습니다. 당신이 걸어온 길의 경험과 배움이 지금의 상황에 직접적인 영향을 미치고 있습니다. 과거의 지혜를 현재의 나침반으로 삼으세요.`,
+    '조언': rev
+      ? `조언의 자리에 <b>${cardName}</b>가 역방향으로 나타났습니다. 카드는 지금 당신이 하려는 방향과 반대로 가보거나, 혹은 멈추고 재고해볼 것을 권하고 있습니다. 때로는 한 발 물러서는 것이 가장 현명한 전진입니다.`
+      : `조언의 자리에 <b>${cardName}</b>가 정방향으로 등장했습니다. 카드는 당신이 나아갈 방향에 대한 명확한 메시지를 담고 있습니다. 이 조언을 마음에 새기고 실천으로 옮긴다면 원하는 결과에 더 가까워질 것입니다.`,
+    '결과': rev
+      ? `결과의 자리에 <b>${cardName}</b>가 역방향으로 나타났습니다. 현재의 방향을 그대로 유지한다면 원하는 결과보다 다소 지연되거나 다른 형태로 나타날 수 있습니다. 지금이 바로 방향을 조율할 적기입니다.`
+      : `결과의 자리에 <b>${cardName}</b>가 정방향으로 등장했습니다. 지금의 흐름대로 나아간다면 이 카드가 보여주는 결실을 맺게 될 것입니다. 과정을 믿고 꾸준히 전진하세요.`,
+  };
+  return ctx[pos] || (rev
+    ? `<b>${cardName}</b>가 역방향으로 등장하며 이 에너지가 내면으로 향하고 있음을 알립니다.`
+    : `<b>${cardName}</b>가 정방향으로 등장하며 강한 에너지를 전달하고 있습니다.`);
+}
+
+// 심층 카드별 추가 해석 (depth=3 전용)
+function cardDeepMean(c, rev, pos){
+  const posGuide = {
+    '과거':'과거의 에너지로서 ','현재':'현재 상황에서 ','미래':'앞으로 다가올 흐름으로 ',
+    '조언':'카드가 건네는 조언은 ','결과':'최종 결과로서 ','내면':'당신의 내면 깊은 곳에서는 ',
+    '외부환경':'주변 환경은 ','현재 상황':'지금 이 순간 ',
+    '가까운 미래':'조만간 ','장애물':'당신 앞의 장애물은 ','최종 결과':'최종적으로 '
+  };
+  const guide = posGuide[pos]||'이 위치에서 ';
+  const tone = rev ? '역방향으로 등장한 ' : '정방향으로 등장한 ';
+  const deepTexts = [
+    `${guide}${tone}<b>${c.kr}</b> 카드는 단순한 의미 이상을 전합니다. <b>${c.keys[0]}</b>와 <b>${c.keys[1]}</b>의 에너지가 복합적으로 작용하고 있습니다. ${rev?'역방향은 이 에너지가 아직 내면에서 완전히 발현되지 못하고 있음을 나타냅니다. 억눌린 것을 인식하고 해소하는 것이 변화의 출발점입니다.':'이 에너지가 지금 외부로 활발하게 흐르고 있습니다. 이 흐름을 의식적으로 인식하고 방향을 잡으면 원하는 결과에 가까워집니다.'} 이 카드가 이 자리에 놓인 것은 우연이 아닙니다.`,
+    `${guide}${tone}<b>${c.kr}</b>의 에너지는 <b>${c.keys[2]||c.keys[0]}</b>의 측면을 강하게 강조합니다. ${rev?'지금 당신이 경험하는 어려움이나 저항은 내면 깊은 곳에서 해결되지 않은 무언가와 연결되어 있을 수 있습니다. 이것을 직면하는 용기가 지금 가장 필요합니다.':'지금 당신 주변의 에너지와 내면의 에너지가 조화롭게 정렬되고 있습니다. 이 흐름을 타고 한 걸음 더 나아가세요.'} 이 카드의 메시지를 마음에 새겨두세요.`,
+  ];
+  return deepTexts[c.id%2];
+}
+
+// 종합 해석 생성 — 카테고리별 맞춤 해석 엔진
+function generateOverall(drawnCards, sp, q, depth=2, product=null, movingDates=null) {
+  const majorCount = drawnCards.filter(d=>TAROT[d.ci].suit==='메이저').length;
+  const suits = [...new Set(drawnCards.map(d=>TAROT[d.ci].suit))];
+
+  const revRatio = drawnCards.filter(d=>d.rev).length / drawnCards.length;
+  const pos = revRatio < 0.4; // true=긍정적 흐름
+  const energy = revRatio>=0.6?'다소 어려운 흐름':revRatio>=0.3?'복합적인 흐름':'비교적 긍정적인 흐름';
+  const cs = drawnCards.map(({ci,rev})=>`${TAROT[ci].kr}(${rev?'역':'정'})`).join(', ');
+  const key1 = TAROT[drawnCards[0]?.ci]?.kr||'';
+  const key2 = TAROT[drawnCards[1]?.ci]?.kr||key1;
+  const key3 = TAROT[drawnCards[2]?.ci]?.kr||key2;
+  const revCount = drawnCards.filter(d=>d.rev).length;
+
+  // ── 상품 카테고리 / 이름으로 강제 주제 결정 ──
+  const pname = product?.name||'';
+  const pcat  = product?.category||'';
+  const forcedTopic =
+    /재회/.test(pname)                              ? 'reunion'    :
+    /속마음/.test(pname)                            ? 'mind'       :
+    /궁합/.test(pname)                              ? 'compat'     :
+    /짝사랑/.test(pname)                            ? 'crush'      :
+    pcat==='love'                                   ? 'love'       :
+    /사업/.test(pname)                              ? 'business'   :
+    /취업|이직/.test(pname)                         ? 'employment' :
+    /적성/.test(pname)                              ? 'aptitude'   :
+    /직업/.test(pname)                              ? 'job'        :
+    pcat==='career'                                 ? 'job'        :
+    /금전/.test(pname)                              ? 'cashflow'   :
+    /재물|투자/.test(pname)||pcat==='money'         ? 'money'      :
+    /건강/.test(pname)||pcat==='health'             ? 'health'     :
+    /이사|택일/.test(pname)                         ? 'moving'     :
+    /임신|출산/.test(pname)                         ? 'birth'      :
+    /꿈해몽|꿈/.test(pname)                         ? 'dream'      :
+    /년운|연간/.test(pname)                         ? 'yearly'     :
+    /월운|월간/.test(pname)                         ? 'monthly'    :
+    /성격|본성/.test(pname)                         ? 'character'  :
+    pcat==='daily'                                  ? 'daily'      : null;
+
+  // 질문에서 주제 감지 (강제 주제 없을 때)
+  const ql = q||'';
+  const qTopic = ql ? (
+    /판결|재판|소송|법원|무죄|유죄|검찰|고소|피의자/.test(ql)?'legal':
+    /사랑|연애|남자친구|여자친구|남친|여친|남편|아내|결혼|이별|헤어|짝사랑|고백/.test(ql)?'love':
+    /취업|직장|회사|사업|이직|승진|면접|창업|일자리/.test(ql)?'job':
+    /돈|수입|투자|빚|대출|재정|월급|수익|재산|주식|부동산/.test(ql)?'money':
+    /건강|병|아프|수술|치료|몸|병원|통증/.test(ql)?'health':
+    /시험|합격|공부|수능|입시|자격증|성적/.test(ql)?'exam':
+    'general'
+  ) : 'general';
+
+  const mainTopic = forcedTopic||qTopic;
+
+  // ── 주제별 해석 섹션 생성기 ──
+  const S = (title, body) =>
+    `<div style="margin-bottom:22px;"><div style="color:var(--gold);font-size:.78rem;letter-spacing:2px;margin-bottom:10px;">${title}</div><p style="line-height:2.2;margin:0;">${body}</p></div>`;
+
+  const suitNote = suits.includes('메이저')?' 이번 리딩에 메이저 아르카나가 포함되어 있어, 단순한 일상의 흐름을 넘어 인생의 중요한 전환점과 깊은 업보적 에너지가 작용하고 있음을 알려줍니다.':
+    suits.includes('완드')?' 완드 수트의 에너지가 강하게 흐릅니다. 열정, 행동력, 새로운 시작의 기운이 지금 당신 주변에 살아있습니다.':
+    suits.includes('컵')?' 컵 수트의 에너지가 두드러집니다. 감정과 직관, 관계의 흐름이 이번 리딩의 핵심 키워드입니다.':
+    suits.includes('검')?' 검 수트의 에너지가 나타납니다. 명확한 판단과 결단, 때로는 갈등과 시련을 통한 성장이 이 시기의 흐름입니다.':
+    ' 펜타클 수트의 에너지가 중심입니다. 현실적인 물질, 재정, 몸의 건강과 관련된 흐름이 지금 주요하게 작용하고 있습니다.';
+
+  function sec(topic) {
+    switch(topic) {
+      case 'love': return S('💕 연애 · 관계',
+        `이번 리딩에서 ${key1}${key2!==key1?`, ${key2}`:''} 카드가 당신의 연애 흐름을 말하고 있습니다. 전체 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `지금 당신의 연애 에너지는 서서히 꽃을 피우기 시작하는 흐름입니다. <b>솔로라면</b>, 가까운 시일 내에 뜻밖의 장소나 예상치 못한 인연의 기운이 당신 곁으로 다가오고 있습니다. 오랫동안 지나쳐왔던 사람이 새롭게 보이거나, 공통 관심사를 통해 만남이 시작될 가능성이 있습니다. 지금 이 시기에는 외모를 가꾸고 새로운 환경에 적극적으로 나가는 것이 중요합니다. 마음의 문을 열어두면 기회는 반드시 찾아옵니다. <b>연애 중이라면</b>, 두 사람 사이의 에너지가 점점 더 가까워지고 있습니다. 서로에 대한 이해도가 높아지는 시기이므로, 솔직한 대화와 감정 표현이 관계의 깊이를 더해줄 것입니다. 지금 느끼는 감정을 굳이 숨기거나 조절하려 하기보다, 있는 그대로 표현하는 것이 두 사람의 거리를 좁히는 열쇠입니다.`
+          : `지금 당신의 연애 에너지는 다소 복잡하고 무거운 국면에 놓여 있습니다. <b>솔로라면</b>, 지금은 연애보다 자기 자신에게 집중하는 시기임을 카드가 말하고 있습니다. 마음이 비어있거나 외로움이 클수록, 그 감정을 억지로 채우려는 욕구가 생길 수 있습니다. 그러나 지금의 고독은 낭비가 아니라 다음 좋은 인연을 위한 내면 충전의 시간입니다. 자신을 사랑하고 삶을 풍요롭게 만드는 데 에너지를 쏟으면, 자연스럽게 건강한 인연이 찾아옵니다. <b>연애 중이라면</b>, 두 사람 사이에 말하지 못한 감정이나 기대치 차이가 쌓여있을 수 있습니다. 작은 오해도 방치하면 감정의 골이 깊어지므로, 용기 내어 솔직한 대화의 자리를 만드는 것이 중요합니다. 상대방을 바꾸려 하기보다 내 감정을 먼저 명확히 하고 전달하는 것이 우선입니다.`
+        )+`${revCount>0?' 역방향 카드는 지금 감정을 억누르거나 표현하지 못하는 부분이 있음을 알려줍니다. 용기 있는 솔직함이 지금 가장 필요한 행동입니다.':''}${suitNote}`
+      );
+      case 'money': return S('💰 재물 · 금전',
+        `재물운의 핵심 카드 ${key1}${key2!==key1?`, ${key2}`:''} 의 에너지는 <b>${energy}</b>를 가리킵니다. `+
+        (pos
+          ? `재정 흐름에 서서히 긍정적인 기운이 유입되고 있습니다. 지금까지 꾸준히 쌓아온 노력과 내공이 수입이나 기회의 형태로 결실을 맺을 가능성이 감지됩니다. 부업이나 새로운 수입원에 대한 아이디어가 있다면, 너무 늦기 전에 작은 규모로 실험해보는 것도 좋습니다. 단, 지금은 무리한 투자나 대규모 지출보다 안정적인 기반을 다지는 전략이 장기적으로 유리합니다. 충동적인 소비 패턴이 있다면 이 시기에 반드시 점검하고, 목적이 명확한 지출만 허용하는 습관을 들이세요. 돈은 에너지입니다. 감사하는 마음으로 다루면 더 많은 풍요가 순환됩니다. 재테크나 투자에 관심이 있다면, 검증된 방법을 충분히 공부한 후 소액으로 시작하세요. 서두르지 않아도 됩니다. 이 흐름은 당신 편입니다.`
+          : `현재 재정적으로 주의와 긴장이 필요한 국면입니다. 지출이 수입을 앞서거나, 예상치 못한 비용이 발생할 수 있는 흐름이 감지됩니다. 지금 당장 충동적인 구매나 확실하지 않은 투자는 잠시 멈추는 것이 안전합니다. 가계부나 지출 기록을 통해 돈이 어디서 어떻게 새고 있는지 냉정하게 점검하는 것이 첫 번째 단계입니다. 누군가에게 돈을 빌려주거나 보증을 서는 일도 지금은 피하는 것이 좋습니다. 단기적으로 어렵더라도 이 시기를 지혜롭게 버텨내면 반드시 회복과 안정의 흐름이 찾아옵니다. 재정 전문가의 상담이나 체계적인 절약 플랜 수립을 고려해보세요.`
+        )+`${suits.includes('펜타클')?' 펜타클 카드의 등장은 지금이 이상보다 현실적인 플랜을 세울 때임을 강조합니다. 머릿속 계획을 종이에 구체적으로 써내려가는 것부터 시작하세요.':''}${suitNote}`
+      );
+      case 'job': return S('🎯 직업 · 진로',
+        `${key1}${key2!==key1?`, ${key2}`:''} 카드가 당신의 진로 방향을 가리키고 있습니다. 에너지 흐름은 <b>${energy}</b>입니다. `+
+        (pos
+          ? `지금 걷고 있는 방향은 옳은 방향입니다. 당신이 오랜 시간 갈아온 역량과 경험이 드디어 빛을 발할 순간이 다가오고 있습니다. 이직이나 취업을 준비하고 있다면, 스스로를 너무 작게 보지 마세요. 당신이 생각하는 것보다 당신의 가치는 더 크고 귀합니다. 중요한 면접이나 발표가 앞에 있다면, 완벽하게 준비된 답변보다 진정성 있는 자신의 이야기가 훨씬 더 좋은 인상을 남깁니다. 지금 당장 결과가 눈에 보이지 않더라도 절대 멈추지 마세요. 뿌린 씨앗은 반드시 싹을 틔웁니다. 주변에 멘토나 귀인을 적극적으로 찾고, 네트워크를 넓히는 것도 이 시기의 중요한 과제입니다.`
+          : `원하는 결과가 지금 당장 눈앞에 펼쳐지지 않더라도, 이것이 실패가 아님을 기억하세요. 방향은 맞지만 타이밍이나 전략을 재점검할 시기입니다. 지금은 결과보다 과정에 집중하고, 자신의 강점이 무엇인지 다시 한번 냉정하게 파악하는 것이 중요합니다. 남과 비교하는 것은 지금 당신에게 독이 됩니다. 나만의 속도와 방향을 믿으세요. 필요하다면 전문적인 커리어 상담이나 코칭을 받는 것도 좋은 방법입니다. 잠시 멈추는 것이 후퇴가 아닙니다. 더 높이 도약하기 위한 도움닫기임을 잊지 마세요.`
+        )+`${majorCount>0?' 메이저 아르카나의 등장은 이 진로 결정이 당신 인생의 중요한 전환점이 될 수 있음을 강하게 암시합니다. 신중하게, 그러나 두려워하지 말고 결단하세요.':''}${suitNote}`
+      );
+      case 'weekly': return S('📆 이번 주 전체 흐름',
+        `이번 주 ${cs} 카드가 펼쳐졌습니다. 전체 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `이번 주는 활동하고 움직이기에 매우 좋은 기운이 흐릅니다. 주 초반(월~화)에 중요한 결정이나 미팅, 약속을 잡으면 에너지적으로 유리합니다. 주 중반에는 예상치 못했던 긍정적인 소식이나 만남이 찾아올 수 있으니, 놓치지 않도록 마음을 열어두세요. 주 후반(목~금)에는 그간의 노력이 작은 결실로 이어질 가능성이 있습니다. 이번 주 특히 중요한 것은 소통입니다. 먼저 연락하는 것을 두려워하지 마세요. 주변 사람들과 적극적으로 교류하면 생각지 못한 도움이나 기회가 생깁니다. 몸도 지금 좋은 상태이니 새로운 운동이나 활동을 시작하기에도 좋은 타이밍입니다.`
+          : `이번 주는 무리하게 속도를 내기보다 자신의 페이스를 잘 조절하며 나아가는 것이 최선입니다. 주 초반에 에너지가 다소 낮거나 집중이 잘 안 될 수 있으니, 중요한 결정이나 발표는 주 후반으로 미루는 것이 좋습니다. 충동적으로 내리는 결정은 나중에 후회를 낳을 수 있으니 신중하게 판단하세요. 이번 주는 특히 수면과 식사, 몸의 휴식을 최우선으로 두는 것이 중요합니다. 무너진 기초를 다시 세우는 주간으로 삼으세요. 주말이 다가올수록 에너지가 서서히 회복되는 흐름이 있으니, 조금만 버티면 다음 주가 훨씬 더 나아질 것입니다.`
+        )+suitNote
+      );
+      case 'compat': return S('💞 궁합 · 케미 분석',
+        `두 사람의 에너지를 ${cs} 카드로 분석했습니다. 전체 흐름은 <b>${energy}</b>입니다. `+
+        (pos
+          ? `두 사람 사이에 자연스럽고 편안한 에너지의 흐름이 감지됩니다. 서로의 성격이나 가치관의 차이가 있더라도, 그 차이가 갈등보다 상호 보완의 역할을 하는 궁합입니다. 함께 있을수록 서로를 더 성장시키는 관계가 될 가능성이 높습니다. 두 사람 모두 관계에서 배움을 얻고 서로에게 좋은 영향을 주고 있습니다. 갈등이 생기더라도 대화로 풀어나가는 능력이 있으며, 위기가 오히려 두 사람을 더 단단하게 만드는 계기가 됩니다. 함께하는 시간을 늘리고, 공통 취미나 목표를 만들어가세요. 이 관계는 단순한 설렘을 넘어 서로에게 진정한 안식처가 될 수 있는 가능성을 가지고 있습니다.`
+          : `두 사람의 에너지가 지금 이 시점에서 다소 엇박자를 이루고 있습니다. 서로가 원하는 것, 기대하는 방식, 사랑의 언어가 달라 오해가 생기기 쉬운 구조입니다. 이것이 잘못된 인연이거나 나쁜 궁합이라는 의미가 아닙니다. 오히려 서로의 차이를 정확하게 인식하고 인정하는 단계가 필요하다는 신호입니다. 지금 이 시기에 두 사람에게 가장 필요한 것은 충분한 대화입니다. 감정을 쌓아두거나 혼자 판단하지 말고, 직접 솔직하게 이야기하는 자리를 만드세요. 한쪽이 지나치게 맞춰가거나 희생하는 구도라면, 지금 바로 그 패턴을 인식하고 조율해야 합니다.`
+        )+`${majorCount>0?' 메이저 아르카나의 등장은 이 관계가 단순한 인연을 넘어 삶에 큰 영향을 미치는 운명적 의미를 가질 수 있음을 암시합니다.':''}${suitNote}`
+      );
+      case 'moving': {
+        // 날짜 포맷: "2026-06-23" → "2026년 06월 23일"
+        const fmtDate = d => {
+          if(!d) return null;
+          const parts = d.split('-');
+          if(parts.length!==3) return d;
+          return `${parts[0]}년 ${parts[1]}월 ${parts[2]}일`;
+        };
+        // 한국어 조사: 받침 있으면 이/을/과, 없으면 가/를/와
+        const korJ = (str, type) => {
+          if(!str) return '';
+          const code = str.charCodeAt(str.length-1);
+          const hasBatchim = code>=0xAC00 && code<=0xD7A3 && (code-0xAC00)%28!==0;
+          return type==='sub'?(hasBatchim?'이':'가'):type==='obj'?(hasBatchim?'을':'를'):(hasBatchim?'과':'와');
+        };
+        const d1s = fmtDate(movingDates?.d1);
+        const d2s = fmtDate(movingDates?.d2);
+        const hasBoth = !!(d1s && d2s);
+
+        // 두 날짜 비교: 카드를 절반씩 나눠 역방향 비율로 상대 우열 판단
+        let betterDate = null, worseDate = null, d1Better = false;
+        if(hasBoth){
+          const half = Math.ceil(drawnCards.length/2);
+          const grp1 = drawnCards.slice(0, half);
+          const grp2 = drawnCards.slice(half);
+          const rev1 = grp1.filter(c=>c.rev).length / (grp1.length||1);
+          const rev2 = grp2.filter(c=>c.rev).length / (grp2.length||1);
+          const score1 = grp1.reduce((s,c)=>s+(c.rev?0:TAROT[c.ci].id||5),0);
+          const score2 = grp2.reduce((s,c)=>s+(c.rev?0:TAROT[c.ci].id||5),0);
+          d1Better = rev1 < rev2 || (rev1===rev2 && score1>=score2);
+          betterDate = d1Better ? d1s : d2s;
+          worseDate  = d1Better ? d2s : d1s;
+        }
+
+        const dateInfo = hasBoth
+          ? `입력하신 날짜 <b>${d1s}</b>${korJ(d1s,'and')} <b>${d2s}</b>${korJ(d2s,'obj')} 비교 분석합니다. `
+          : d1s ? `입력하신 날짜 <b>${d1s}</b>의 에너지를 분석합니다. ` : '';
+
+        const compareBlock = hasBoth
+          ? (pos
+            ? `두 날짜를 카드 에너지로 비교했을 때, <b>${betterDate}</b>의 기운이 더 활성화되어 있고 움직임에 유리합니다. <b>${worseDate}</b>${korJ(worseDate,'sub')} 상대적으로 정체되는 기운이 있으니, 가능하다면 <b>${betterDate}</b>${korJ(betterDate,'obj')} 우선적으로 고려하세요. `
+            : `두 날짜 모두 에너지적으로 다소 조심스러운 흐름이 감지됩니다. 그러나 굳이 하나를 선택해야 한다면 <b>${betterDate}</b>${korJ(betterDate,'sub')} <b>${worseDate}</b>보다 상대적으로 안정적인 기운을 가지고 있습니다. 다만 서두르기보다 충분한 현장 확인과 전문가 조언을 거친 후 최종 결정을 내리세요. `)
+          : '';
+
+        return S('🏠 이사 · 택일 타이밍',
+          `이사와 중요한 날짜 결정에 관해 ${cs} 카드가 응답했습니다. ${dateInfo}전체 에너지는 <b>${energy}</b>입니다. ${compareBlock}`+
+          (pos
+            ? `움직임과 변화를 위한 좋은 기운이 흐르고 있습니다. 계획하고 있는 이사나 계약을 실행하기에 에너지적으로 유리한 시기입니다. 방향은 해가 뜨는 동쪽 혹은 햇빛이 잘 드는 남향이 긍정적인 기운을 가집니다. 계약서에 서명하거나 날짜를 확정할 때는 홀수일보다 짝수일이 안정적이며, 월요일이나 목요일이 에너지적으로 좋습니다. 새 집이나 사무실을 고를 때는 햇빛이 충분히 드는 공간을 최우선으로 고려하세요. 이사 후 3개월 이내에 긍정적인 변화의 조짐이 나타날 것입니다.`
+            : `지금 당장 큰 움직임을 결행하기보다 충분한 시간 여유를 두고 재점검하는 것이 안전합니다. 서두른 계약이나 날짜 확정에서 예상치 못한 변수나 추가 비용이 발생할 가능성이 있습니다. 이사나 계약 전 반드시 여러 번 현장을 직접 방문해 확인하고, 주변 지인이나 부동산·법률 전문가의 의견을 충분히 수렴하세요. 계약서의 특약사항과 조항 하나하나를 꼼꼼히 검토하는 것이 특히 중요합니다. 지금 당장이 어렵다면 한 달에서 두 달 후의 날짜를 다시 점검해보세요. 기다림이 더 좋은 자리와 타이밍을 가져다줄 것입니다.`
+          )+suitNote
+        );
+      }
+      case 'birth': return S('🌸 임신 · 출산 에너지',
+        `새 생명과 관련된 에너지를 ${cs} 카드로 살펴보았습니다. 전체 흐름은 <b>${energy}</b>입니다. `+
+        (pos
+          ? `생명의 에너지가 밝고 따뜻하게 감지됩니다. 임신을 준비 중이라면 몸과 마음이 함께 그 준비를 해나가고 있는 흐름이 보입니다. 긍정적인 마음가짐과 규칙적인 생활 리듬, 충분한 수면과 영양 공급이 지금 가장 중요한 실천입니다. 지나친 걱정보다 설렘과 감사의 에너지에 집중하세요. 이미 임신 중이라면 순산의 에너지가 흐르고 있으며, 아이의 건강한 탄생을 향해 좋은 흐름이 이어지고 있습니다. 주변의 도움을 감사히 받아들이고, 혼자 모든 것을 감당하려 하지 마세요. 파트너와의 충분한 소통과 정서적 유대가 이 시기에 특히 중요합니다.`
+          : `현재 에너지가 다소 불안정하거나 긴장 상태에 있는 것이 느껴집니다. 몸의 신호에 더욱 민감하게 귀 기울이고, 스트레스와 피로를 줄이는 것이 무엇보다 중요한 시기입니다. 마음이 불안하다면 혼자 감당하기보다 신뢰할 수 있는 의료 전문가와 반드시 상담하세요. 타로 리딩은 정서적 지지의 도구일 뿐, 의학적 판단을 대신할 수 없습니다. 내면의 불안을 인정하고, 그 감정을 파트너나 가까운 사람에게 솔직하게 표현하는 것이 도움이 됩니다. 좋은 소식은 반드시 때가 되면 찾아오게 되어 있습니다.`
+        )+` ⚕️ <span style="font-size:.8rem;opacity:.7;">※ 타로는 의학적 진단을 대체하지 않습니다. 건강 관련 사항은 반드시 산부인과 전문의와 상담하세요.</span>` +suitNote
+      );
+      case 'dream': return S('🌙 꿈해몽 해석',
+        `간밤의 꿈 에너지와 ${cs} 카드를 연결해 해석했습니다. 전체 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `꿈이 전달하는 에너지는 전반적으로 긍정적인 신호를 담고 있습니다. `+
+          (suits.includes('컵')?'물, 바다, 비, 눈물이 등장하는 꿈 혹은 감정적으로 강렬했던 꿈은 내면 깊은 곳의 감정이 해소를 원하고 있다는 신호입니다. 억눌러왔던 감정을 꺼내 표현할 용기를 내보세요. 이 꿈은 당신이 감정적으로 성장하고 있음을 알려줍니다. 다음 며칠 안에 중요한 감정적 계기가 찾아올 수 있으니 마음을 열어두세요.':
+           suits.includes('완드')?'불, 태양, 빠른 움직임이 있는 활동적인 꿈은 내면의 실행 의지가 깨어나고 있다는 강한 신호입니다. 오래 마음속에 품어왔지만 실행하지 못했던 계획이 있다면, 지금이 바로 첫걸음을 내딛을 때입니다. 이 꿈은 행동하라는 무의식의 외침입니다. 두려움을 내려놓고 시작하세요.':
+           suits.includes('검')?'갈등, 쫓김, 날카로운 물체, 말다툼이 등장하는 긴장된 꿈은 현실에서 해결되지 않은 갈등이나 억눌린 분노, 혹은 결정을 미루고 있는 문제가 있음을 알려줍니다. 회피하지 말고 용기 내어 마주하세요. 이 꿈은 당신 안의 용기를 깨우라는 신호입니다.':
+           '집, 돈, 음식, 땅과 관련된 현실적인 꿈은 물질적 안정과 풍요에 대한 욕구와 가능성을 반영합니다. 지금 현실적인 계획을 구체화하거나 재정 정비를 시작하기에 좋은 타이밍입니다. 이 꿈은 행운의 문이 열리고 있음을 알려줍니다.')+
+          ` 꿈은 무의식이 보내는 진실된 메시지입니다. 꿈속 장면과 감정을 가볍게 여기지 말고, 일기에 기록해 보세요.`
+          : `꿈이 전달하는 에너지에 다소 불안하거나 어두운 기운이 섞여 있습니다. 악몽이나 불편한 꿈, 쫓기거나 넘어지는 꿈은 현실에서 해소되지 않은 긴장, 두려움, 혹은 오래된 상처나 미해결 감정이 표면으로 올라오고 있다는 신호입니다. 이 꿈을 외면하거나 무시하려 하지 마세요. 그 불편한 감정 안에 당신이 직면해야 할 중요한 메시지가 숨어 있습니다. 꿈속에서 느꼈던 감정을 적어보고 천천히 그 뿌리를 들여다보는 작업이 지금 당신에게 필요합니다. 이 시기에 명상이나 상담, 일기 쓰기 등 내면 탐구의 활동을 권합니다. 불안한 꿈은 내면이 성장하고 있는 과정임을 기억하세요.`
+        )+suitNote
+      );
+      case 'reunion': return S('🌹 재회 · 인연 재결합',
+        `재회를 바라는 마음과 함께 뽑힌 ${key1}${key2!==key1?`, ${key2}`:''} 카드는 <b>${energy}</b>를 보여줍니다. `+
+        (pos
+          ? `재회의 가능성이 에너지적으로 감지됩니다. 상대방도 이 관계를 완전히 마음속에서 지우지 못한 감정의 흔적이 있을 가능성이 있습니다. 잊으려 하지만 잊히지 않는 기억, 그것이 두 사람 모두에게 남아있는 미완성의 이야기일 수 있습니다. 그러나 재회가 의미 있으려면 단순히 과거로 돌아가는 것이 아니라, 두 사람 모두 각자의 자리에서 성장했어야 합니다. 지금 먼저 연락을 취하고 싶은 충동이 있다면, 그 마음이 진정한 사랑에서 비롯된 것인지, 아니면 외로움이나 미련에서 비롯된 것인지 스스로 솔직하게 물어보세요. 억지로 타이밍을 만들기보다 자연스러운 흐름에 맡기는 것이 현명하며, 재회가 이루어진다면 그것은 두 사람 모두의 성장이 준비되었을 때입니다.`
+          : `지금 당장 재회로 이어지기에는 에너지적으로 아직 준비가 되지 않은 흐름입니다. 두 사람 사이에 아직 해소되지 않은 감정의 상처나 오해가 남아있을 수 있습니다. 지금 조급하게 접촉하는 것은 오히려 더 큰 상처로 이어질 위험이 있습니다. 먼저 충분한 시간과 거리를 두는 것이 두 사람 모두를 위한 길입니다. 지금 이 시기는 상대에게 집중하기보다 나 자신의 상처를 치유하고 삶을 풍요롭게 가꾸는 데 에너지를 쏟아야 합니다. 자신이 온전하고 행복할 때, 인연은 가장 아름다운 형태로 돌아옵니다.`
+        )+`${revCount>0?' 역방향 카드의 등장은 현재 서두르거나 억지로 밀어붙이지 말라는 분명한 메시지입니다. 내면의 치유가 재회보다 먼저입니다.':''}${suitNote}`
+      );
+      case 'mind': return S('💌 그 사람의 속마음',
+        `상대방의 마음을 묻는 리딩에서 ${key1}${key2!==key1?`, ${key2}`:''} 카드가 응답했습니다. 전체 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `카드는 상대방이 당신에 대해 긍정적이고 따뜻한 감정을 품고 있음을 암시합니다. 겉으로는 담담하거나 무뚝뚝하게 보일 수 있지만, 마음 한편에 당신을 향한 시선이 분명히 존재합니다. 다만 상대가 아직 그 감정을 충분히 정리하지 못했거나, 자신의 감정을 표현하는 방식이 서툰 사람일 가능성이 있습니다. 상대의 말보다 행동을 더 주의 깊게 관찰하세요. 당신에게 특별하게 대하는 작은 배려와 관심의 신호들이 그의 진심을 드러내고 있을 수 있습니다. 지금은 당신이 먼저 따뜻하고 편안한 분위기를 만들어주면, 상대가 자연스럽게 감정을 열 가능성이 높아집니다.`
+          : `상대방은 현재 자신의 감정에 대해 스스로도 혼란스러운 상태에 있는 것으로 보입니다. 당신에 대한 감정이 완전히 사라진 것이 아니라, 다양한 생각과 복잡한 상황이 얽혀 있어 명확한 감정 표현을 하기 어려운 상황일 수 있습니다. 지금 상대에게 명확한 답을 요구하거나 감정을 확인하려는 시도는 역효과를 낼 가능성이 높습니다. 상대에게 충분한 공간과 시간을 주는 것이 지금 당신이 할 수 있는 가장 현명한 행동입니다. 동시에, 당신 스스로도 이 관계에서 진정으로 원하는 것이 무엇인지 명확히 해두는 것이 중요합니다.`
+        )+suitNote
+      );
+      case 'employment': return S('🎯 취업 · 합격',
+        `취업과 합격에 관한 흐름을 ${key1}${key2!==key1?`, ${key2}`:''} 카드가 보여줍니다. 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `지금 준비하고 있는 방향과 노력의 에너지가 올바른 흐름을 타고 있습니다. 당신이 생각하는 것 이상으로 당신의 역량과 가능성이 돋보이고 있습니다. 면접이나 시험이 앞에 있다면 그동안 쌓아온 실력을 믿고 자신 있게 임하세요. 과도한 긴장은 오히려 준비한 것을 발휘하지 못하게 합니다. 완벽하지 않아도 됩니다. 진정성 있는 나다운 모습을 보여주는 것이 합격의 가장 중요한 열쇠입니다. 서류 준비, 자기소개서, 면접 준비에서 진심이 담긴 나만의 이야기를 담으세요. 합격 소식은 생각보다 가까이 있습니다.`
+          : `원하는 결과가 지금 당장 오지 않더라도 이것이 당신의 한계가 아닙니다. 지원 전략이나 준비 방식을 객관적으로 재점검할 필요가 있는 시기입니다. 거절이나 실패 앞에서 자신을 탓하지 마세요. 이 과정들은 모두 더 나은 자리로 가는 여정의 일부입니다. 혼자 고민하지 말고 취업 선배나 전문가의 피드백을 적극적으로 구하세요. 제3자의 시각에서 발견한 개선점이 당신의 합격률을 크게 높여줄 것입니다. 포기하지 않는 사람이 결국 원하는 자리를 얻게 됩니다.`
+        )+`${suits.includes('검')?' 검 수트는 전략적이고 분석적인 사고를 강조합니다. 감정적 접근보다 체계적인 준비와 논리적 표현이 이번 취업 과정에서 결정적 역할을 합니다.':''}${suitNote}`
+      );
+      case 'business': return S('🏢 사업 · 창업',
+        `사업 흐름에 대해 ${key1}${key2!==key1?`, ${key2}`:''} 카드가 응답했습니다. 전체 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `사업의 에너지가 상승 기류를 타기 시작하고 있습니다. 오랫동안 구상해온 아이디어나 계획을 실행에 옮기기에 좋은 시기가 다가오고 있습니다. 단, 열정만큼이나 철저한 사전 준비와 현실적인 자금 계획이 반드시 뒷받침되어야 합니다. 감정적 결정보다 데이터와 분석에 기반한 판단을 내리세요. 믿을 수 있는 파트너나 전문 조력자를 곁에 두고, 리스크를 분산시키는 전략도 병행하세요. 무리한 초기 확장보다 작게 시작해 빠르게 검증하는 방식이 이 시기에 맞습니다. 지금 선택하는 사업 방향이 앞으로 몇 년의 흐름을 결정할 수 있으므로, 신중하되 기회를 놓치지 마세요.`
+          : `사업에서 예상치 못한 장벽이나 정체기에 직면할 수 있는 에너지가 감지됩니다. 지금은 새로운 사업 확장이나 큰 투자 결정보다 현재 구조와 비용을 면밀히 점검하고 안정화하는 것이 우선입니다. 핵심 사업에 집중하고 비핵심 영역은 과감하게 줄이는 결단이 필요할 수 있습니다. 신뢰할 수 있는 파트너나 투자자, 고객 관계를 더욱 단단히 하는 데 에너지를 쏟으세요. 이 시기를 내실을 다지는 재정비의 기간으로 삼는다면, 다음 도약의 발판이 훨씬 탄탄해질 것입니다.`
+        )+`${suits.includes('완드')?' 완드 수트의 강한 에너지는 지금 사업에 열정과 추진력이 살아있음을 말합니다. 아이디어를 실행으로 옮기는 결단력을 믿으세요.':''}${suitNote}`
+      );
+      case 'yearly': return S('🎋 올해 전체 운세',
+        `올 한 해의 흐름을 ${cs} 카드가 깊이 펼쳐 보여줍니다. 전체 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `올해는 당신에게 변화와 성장의 강한 기운이 흐르는 해입니다. 상반기에는 새로운 씨앗을 심고 기반을 구축하는 시기가 될 것이며, 하반기로 갈수록 그 노력이 결실로 나타나는 흐름입니다. 연초에 마음속으로 세운 목표를 포기하지 말고 꾸준히 밀고 나가세요. 예상치 못한 기회가 찾아왔을 때 유연하게 방향을 조율하는 것도 올해의 중요한 과제입니다. 인간관계 면에서는 귀인과의 만남이 예상됩니다. 새로운 환경이나 낯선 모임에도 적극적으로 나가보세요. 올해의 키워드는 <b>도전, 성실, 그리고 확장</b>입니다. 두려움보다 설렘을 선택하는 한 해가 되기를 바랍니다.`
+          : `올해는 내실을 다지고 뿌리를 깊게 내리는 한 해가 될 것입니다. 외부로 크게 뻗어나가기보다 지금 가진 것을 잘 지키고, 쌓아온 것을 더욱 견고히 하는 전략이 올해의 현명한 선택입니다. 상반기에 다소 지치거나 앞이 막막한 느낌이 들 수 있습니다. 그러나 그 답답함 속에서도 작은 진전을 포기하지 마세요. 하반기로 갈수록 흐름이 서서히 열리고 안정의 기운이 돌아오기 시작합니다. 주변의 소중한 관계를 깊이 가꾸고, 몸과 마음의 건강을 최우선으로 챙기는 한 해가 되기를 바랍니다. 올해의 키워드는 <b>회복, 준비, 그리고 단단함</b>입니다.`
+        )+suitNote
+      );
+      case 'monthly': return S('📅 이번 달 전체 흐름',
+        `이번 달 ${cs} 카드가 가리키는 전반적 에너지는 <b>${energy}</b>입니다. 연애, 재물, 진로, 건강의 전 영역을 아울러 종합적으로 분석합니다. `+
+        (pos
+          ? `이달은 전반적으로 활동하고 전진하기에 좋은 기운이 흐릅니다. 연애·관계 면에서는 감정 표현에 좋은 타이밍이 찾아옵니다. 솔로라면 새로운 만남의 기회를, 연애 중이라면 관계가 한 단계 발전할 수 있는 계기를 맞이할 수 있습니다. 재물 면에서는 이달 중반 이후 예상치 못한 수입이나 기회가 생길 가능성이 있습니다. 다만 충동적인 소비는 자제하고, 목적 있는 지출만 허용하세요. 진로·직업 면에서는 미뤄왔던 도전을 실행에 옮기기 좋은 시기입니다. 새로운 제안이나 기회가 들어온다면 긍정적으로 검토해보세요. 건강 면에서는 지금 컨디션이 좋은 만큼 새로운 운동이나 건강 습관을 시작하기에 최적의 달입니다. 이달의 키워드는 <b>실행과 연결</b>입니다.`
+          : `이달은 페이스를 조절하며 내실을 다지는 것이 가장 현명한 선택입니다. 연애·관계 면에서는 감정적으로 예민해지기 쉬운 달입니다. 오해가 생기지 않도록 소통에 특히 신경 쓰고, 감정을 쌓아두지 말고 대화로 해소하세요. 재물 면에서는 지출을 최소화하고 불필요한 투자나 보증은 피하세요. 돈과 관련된 중요한 결정은 이달 말 이후로 미루는 것이 유리합니다. 진로·직업 면에서는 성급한 이직이나 큰 변화보다 현재 역할에 충실하면서 내부 역량을 강화하는 것이 낫습니다. 건강 면에서는 수면과 식이 관리가 특히 중요한 달입니다. 면역력이 떨어질 수 있으니 컨디션 점검을 소홀히 하지 마세요. 이달의 키워드는 <b>회복과 준비</b>입니다.`
+        )+suitNote
+      );
+      case 'health': return S('🌿 건강 · 활력',
+        `건강 측면에서 ${key1}${key2!==key1?`, ${key2}`:''} 카드는 <b>${energy}</b>를 나타냅니다. `+
+        (pos
+          ? `전반적인 신체 에너지와 활력이 안정적이고 좋은 상태입니다. 규칙적인 수면 리듬과 균형 잡힌 식습관이 지금의 좋은 흐름을 유지하는 핵심 열쇠입니다. 작은 피로 신호도 무시하지 말고 충분한 휴식을 취하는 것이 장기적으로 건강을 지키는 길입니다. 지금 이 시기에 새로운 운동 루틴을 시작하거나 건강 검진을 받는 것도 좋습니다. 정신 건강 면에서도 지금은 마음이 비교적 안정적인 상태이니, 이 여유를 활용해 명상이나 산책 같은 힐링 활동을 꾸준히 이어가세요. 긍정적인 마음이 몸의 면역력을 높인다는 것을 잊지 마세요.`
+          : `몸과 마음 모두에서 피로와 긴장의 신호가 감지됩니다. 억지로 버티거나 참고 넘기기보다, 지금 당장 페이스를 줄이고 충분한 휴식을 취하는 용기가 필요합니다. 미뤄온 건강 검진이 있거나 통증, 이상 증세가 있다면 지체 말고 반드시 전문의의 진단을 받으세요. 건강은 잃은 후에 되찾는 것이 몇 배 더 어렵고 시간도 많이 걸립니다. 수면의 질을 높이고, 가공식품보다 자연 식품 위주의 식단으로 전환하는 것이 도움이 됩니다. 정신 건강 면에서도 혼자 감당하지 말고 주변의 도움을 요청하거나 전문 상담을 고려해보세요.`
+        )+suitNote
+      );
+      case 'exam': return S('📚 시험 · 학업',
+        `시험과 학업에 관해 ${cs} 카드는 <b>${energy}</b>를 나타냅니다. `+
+        (pos
+          ? `지금 쏟고 있는 노력과 시간이 좋은 결과로 이어질 흐름이 감지됩니다. 당신이 목표로 하는 시험이나 자격증, 학업 성과를 향해 에너지가 정렬되어 있습니다. 가장 취약하다고 느끼는 부분을 집중 보완하는 전략이 지금 가장 효과적입니다. 시험 당일에는 과도한 긴장보다 그동안 쌓아온 실력을 믿는 마음이 중요합니다. 컨디션 관리도 실력의 중요한 일부임을 잊지 마세요. 시험 전날은 새로운 내용을 무리하게 넣으려 하기보다 충분한 수면을 취하는 것이 정답입니다. 좋은 소식이 가까이 있습니다.`
+          : `지금 집중이 잘 안 되거나 학습 효율이 떨어지는 느낌이 든다면, 그것은 방법과 전략을 바꿔야 한다는 신호입니다. 무작정 시간을 늘리기보다 핵심을 파악하고 약점 분야를 집중 공략하는 전략으로 전환하세요. 혼자 공부하는 것이 효율적이지 않다면 스터디 그룹이나 전문 강사의 도움을 받는 것도 좋은 방법입니다. 포기하고 싶은 마음이 들 때가 가장 중요한 고비입니다. 그 고비를 넘기면 반드시 다른 풍경이 펼쳐집니다. 자신을 믿고 꾸준함을 유지하는 것이 합격의 가장 확실한 길입니다.`
+        )+suitNote
+      );
+      case 'daily': return S('☀️ 오늘의 에너지',
+        `오늘 하루를 위해 뽑힌 ${key1} 카드는 <b>${energy}</b>를 전합니다. `+
+        (pos
+          ? `오늘은 긍정적인 에너지가 당신 곁에 흐르는 날입니다. 아침부터 활기차게 시작하면 하루 전체의 흐름이 좋아집니다. 오늘 만나는 사람들과의 대화에서 뜻밖의 좋은 소식이나 기회가 전해질 수 있으니 귀를 열어두세요. 오전 중에 중요한 연락이나 결정을 처리하는 것이 유리합니다. 오늘은 당신의 직관이 평소보다 예리하게 작동하고 있습니다. 뭔가 마음에 걸리는 것이 있다면 그 느낌을 신뢰하세요. 저녁에는 혼자만의 시간을 갖거나 가까운 사람과 조용히 대화하는 것이 내일을 위한 에너지 충전에 도움이 됩니다.`
+          : `오늘은 무리하지 않고 차분하게 흐름을 따르는 것이 현명합니다. 예상치 못한 변수나 작은 충돌이 생길 수 있는 에너지가 감지됩니다. 중요한 결정이나 감정적인 대화는 가능하면 내일 이후로 미루는 것이 좋습니다. 오늘은 새로운 시작보다 진행 중인 일을 마무리하고 정리하는 데 집중하세요. 몸이 보내는 피로 신호에 귀를 기울이고, 충분한 수분과 휴식을 챙기세요. 어렵게 느껴지는 하루일수록 작은 것에 감사하는 마음이 하루를 버티는 힘이 됩니다.`
+        )+suitNote
+      );
+      case 'crush': return S('💘 짝사랑 · 설레는 마음',
+        `마음속에 담아둔 그 사람을 향한 감정을 ${key1}${key2!==key1?`, ${key2}`:''} 카드가 읽어줍니다. 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `지금 당신의 감정이 상대에게 서서히 전달되고 있는 흐름이 느껴집니다. 상대방도 당신을 전혀 의식하지 않는 것은 아닙니다. 다만 아직 명확한 감정으로 정리되지 않았을 뿐입니다. 억지로 빠른 답을 요구하기보다 자연스럽게 함께하는 시간을 늘려가는 것이 가장 효과적인 접근입니다. 공통된 관심사나 활동을 통해 더 가까워질 기회를 만들어보세요. 지금 이 설레는 감정 자체가 당신에게 활력을 주고 있습니다. 결과에 집착하기보다 지금 이 순간의 감정을 소중히 즐기는 여유도 필요합니다.`
+          : `지금 이 감정이 상대에게 전달되기까지는 조금 더 시간이 필요한 흐름입니다. 상대방이 현재 다른 생각이나 상황으로 마음이 여유롭지 않을 수도 있습니다. 지금 당장 고백이나 감정 표현을 서두르면 원하는 결과와 멀어질 수 있으니 타이밍을 신중하게 보세요. 한편으로는, 이 감정이 진정한 사랑에서 비롯된 것인지, 아니면 상상과 이상화에서 비롯된 것인지 스스로 한번 차분히 들여다볼 시간도 필요합니다. 나를 먼저 더 매력적이고 충만하게 가꾸는 것이 가장 좋은 짝사랑 전략입니다.`
+        )+suitNote
+      );
+      case 'aptitude': return S('🧭 적성 · 나의 가능성',
+        `내 안의 재능과 방향성에 대해 ${key1}${key2!==key1?`, ${key2}`:''} 카드가 응답했습니다. 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `카드는 당신 안에 아직 충분히 발휘되지 못한 강점과 잠재력이 있음을 분명하게 가리킵니다. 스스로 당연하게 여겨 크게 신경 쓰지 않는 능력이 실제로 다른 사람들이 부러워하는 특별한 재능일 수 있습니다. 지금 하고 싶지만 망설이고 있는 분야가 있다면 그것이 바로 당신이 빛날 수 있는 영역일 가능성이 높습니다. 완벽하게 준비된 후에 시작하려 하지 마세요. 작은 시도와 경험이 쌓이면서 자신의 진짜 적성이 선명해집니다. 남과 비교하지 말고 어제의 나보다 오늘 조금 더 나아진 것에 집중하세요.`
+          : `아직 자신의 진짜 적성과 강점이 무엇인지 명확하게 보이지 않는 시기입니다. 이것은 당신에게 재능이 없다는 것이 아니라, 아직 발견하지 못했거나 충분히 시도해보지 않은 것입니다. 다양한 경험에 문을 열어두고, 관심이 생기는 것들을 작은 것이라도 직접 해보세요. 적성은 머릿속으로 고민한다고 찾아지는 것이 아니라, 직접 몸으로 부딪히면서 발견됩니다. 지금 당장 정답을 찾으려 하지 마세요. 탐색의 과정 자체가 당신을 성장시키고 있습니다.`
+        )+suitNote
+      );
+      case 'cashflow': return S('💵 금전 · 현금 흐름',
+        `단기적인 금전 흐름에 대해 ${key1}${key2!==key1?`, ${key2}`:''} 카드는 <b>${energy}</b>를 나타냅니다. `+
+        (pos
+          ? `이 시기 금전적인 흐름이 안정적이거나 예상치 못한 수입이 들어올 가능성이 있는 에너지입니다. 오랫동안 기다리던 돈이 들어오거나, 작은 부업이나 기회에서 수익이 발생할 수 있습니다. 지금은 들어온 돈을 충동적으로 소비하기보다 일부를 저축하거나 미래를 위한 준비에 쓰는 것이 현명합니다. 지인이나 아는 사람으로부터의 금전 거래는 신중하게 검토하세요. 돈이 순환되는 좋은 흐름이니 감사한 마음으로 유지해나가세요.`
+          : `지출이 수입을 넘어서거나 예상치 못한 비용이 발생할 수 있는 에너지입니다. 지금은 불필요한 소비를 자제하고 지출 내역을 꼼꼼히 점검하는 것이 중요합니다. 투자나 대출, 보증 등 큰 금전 결정은 이 시기를 피해 신중하게 검토하세요. 고정 지출을 줄이고 비상금을 마련해두는 것이 이 시기를 안전하게 통과하는 방법입니다. 지금 어려워 보여도 이 흐름은 일시적입니다. 씀씀이를 줄이고 현금을 확보해두면 반드시 반등의 기회가 찾아옵니다.`
+        )+suitNote
+      );
+      case 'character': return S('🌟 나의 성격 · 본성',
+        `내면 깊은 곳을 탐색하는 ${cs} 카드는 <b>${energy}</b>를 드러냅니다. `+
+        (pos
+          ? `카드는 당신이 생각하는 것 이상으로 강인하고 따뜻한 내면을 가진 사람임을 말해줍니다. 어떤 상황에서도 중심을 잡으려는 의지와 타인을 배려하는 따뜻함이 당신의 가장 큰 강점입니다. 때로는 너무 남을 배려하다 자신을 소홀히 하는 경향이 있을 수 있으니, 나 자신을 먼저 챙기는 것도 이기적인 것이 아님을 기억하세요. 당신 안에는 아직 활용되지 못한 창의성과 통찰력이 있습니다. 혼자만의 조용한 시간이 그 잠재력을 꽃피우는 데 도움이 됩니다. 자신을 더 신뢰하고 사랑하는 것이 지금 가장 중요한 과제입니다.`
+          : `지금 자신에 대한 확신이 흔들리거나 방향을 잃은 느낌이 드는 시기일 수 있습니다. 이것은 당신이 약해서가 아니라, 새로운 자아를 발견하기 위한 탈피의 과정입니다. 과거의 상처나 실패가 나를 규정하도록 두지 마세요. 그것은 당신의 전부가 아닙니다. 지금 내가 불편하게 느끼는 나의 모습이 사실은 변화와 성장의 신호일 수 있습니다. 일기를 쓰거나 조용히 자신과 대화하는 시간을 가져보세요. 자기 이해가 깊어질수록 삶의 방향이 선명해집니다.`
+        )+suitNote
+      );
+      default: return S('🔮 카드가 전하는 메시지',
+        `${cs} 카드의 전체 에너지 흐름은 <b>${energy}</b>입니다. `+
+        (suits.includes('컵')
+          ? (pos?'감정과 직관의 에너지가 활성화되어 있습니다. 지금 느끼는 감정에 솔직해지고, 마음이 원하는 방향으로 한 걸음 내딛어 보세요. 인간관계와 감정의 흐름에서 중요한 변화나 기회가 찾아오고 있습니다.':'감정이 복잡하게 얽혀있는 시기입니다. 억눌러온 감정을 해소하고, 마음의 짐을 내려놓는 것이 우선입니다. 충분한 감정 정리 후에 다음 단계로 나아갈 수 있습니다.')
+          :suits.includes('완드')
+          ? (pos?'행동과 열정의 에너지가 지금 강하게 살아있습니다. 지금이 바로 계획을 실행할 때입니다. 망설임보다 작은 첫 발걸음이 큰 변화를 만들어냅니다.':'열정이 있지만 방향이 흩어져 있는 상태입니다. 에너지를 분산하지 말고 가장 중요한 한 가지에 집중하세요. 선택과 집중이 지금 필요합니다.')
+          :suits.includes('검')
+          ? (pos?'명확한 사고와 결단의 에너지가 당신 곁에 있습니다. 오래 고민해왔던 결정을 이제 내릴 때입니다. 두려움 없이 진실을 직면하는 용기가 당신을 앞으로 나아가게 합니다.':'갈등과 혼란의 에너지가 주변을 감싸고 있습니다. 상황을 감정적으로 바라보기보다 냉정하게 사실을 파악하는 것이 먼저입니다. 필요하다면 잠시 거리를 두고 객관적인 시각을 회복하세요.')
+          : (pos?'물질적 풍요와 안정의 에너지가 흐릅니다. 현실적인 노력과 꾸준함이 이 흐름을 더욱 강화합니다. 지금의 성실함이 반드시 구체적인 결실로 이어집니다.':'현실적인 부분에서 점검이 필요한 시기입니다. 재정, 건강, 일상 루틴을 하나씩 체크하고 정비하세요. 기초를 다시 탄탄히 하면 다음 도약이 훨씬 수월해집니다.')
+        )+suitNote
+      );
+    }
+  }
+
+  // 성격·기질 섹션 (depth 3 전용)
+  function secCharacter() {
+    const trait = suits.includes('메이저')?'변화와 운명의 흐름에 민감하게 반응하는':
+      suits.includes('완드')?'열정적이고 추진력 넘치는':
+      suits.includes('컵')?'감수성이 풍부하고 공감 능력이 탁월한':
+      suits.includes('검')?'논리적이고 명확한 결단력을 가진':'현실적이고 안정을 소중히 여기는';
+    const traitDetail = suits.includes('메이저')
+      ?'인생의 중요한 고비마다 직관이 강하게 작동하며, 단순한 사건도 더 깊은 의미로 받아들이는 성향이 있습니다. 이번 리딩에서 메이저 아르카나의 등장은 지금 당신이 인생의 중요한 전환점에 서 있음을 강하게 암시합니다.'
+      :suits.includes('완드')
+      ?'아이디어가 넘치고 새로운 것을 시작하는 에너지가 강합니다. 다만 시작한 것을 끝까지 완성하는 지속력을 의식적으로 기르는 것이 지금 당신에게 중요한 성장 과제입니다.'
+      :suits.includes('컵')
+      ?'다른 사람의 감정을 섬세하게 읽어내는 능력이 탁월합니다. 그러나 때로는 타인의 감정에 너무 깊이 동화되어 자신의 경계가 흐려질 수 있습니다. 자신을 먼저 챙기는 것을 배워야 할 시기일 수 있습니다.'
+      :suits.includes('검')
+      ?'상황을 빠르게 분석하고 핵심을 꿰뚫는 날카로운 사고를 가지고 있습니다. 지나치게 냉철한 판단이 때로는 감정을 배제해 주변 사람들과의 관계에서 오해를 만들 수 있으니, 따뜻한 언어 표현도 함께 연습하세요.'
+      :'성실함과 꾸준함이 당신의 가장 큰 자산입니다. 눈에 보이는 결과를 중요시하며 현실적인 계획을 세우고 실천하는 능력이 뛰어납니다. 지금 이 특성이 당신을 앞으로 나아가게 하는 핵심 동력입니다.';
+    return S('🌟 기질 · 성격',
+      `이번 리딩에서 등장한 카드들은 당신이 <b>${trait}</b> 에너지를 가진 사람임을 보여줍니다. `+
+      `${key1} 카드가 현재 당신의 내면에서 가장 강하게 작용하는 에너지입니다. ${traitDetail} `+
+      (pos
+        ? `지금 이 시기 당신의 전반적인 에너지는 외부로 향하며 새로운 것을 탐색하고 확장하고 싶은 욕구가 강하게 살아있습니다. 이 에너지를 잘 활용하면 지금 시작하는 일에서 좋은 성과를 낼 수 있습니다. 두려움보다 가능성에 집중하세요.`
+        : `현재는 에너지가 내면으로 향하는 회복과 성찰의 시기입니다. 외부 활동보다 자신을 돌아보고 재정비하는 것이 더 자연스러운 흐름입니다. 이 내면의 시간이 충분히 무르익으면, 더 단단하고 성숙한 모습으로 세상 앞에 서게 될 것입니다.`
+      )
+    );
+  }
+
+  // 행운 마무리 섹션
+  const lucks=[{c:'보라색',d:'북서쪽'},{c:'금색',d:'남쪽'},{c:'파란색',d:'동쪽'},{c:'흰색',d:'북쪽'},{c:'붉은색',d:'남동쪽'}];
+  const lk=lucks[Math.floor(Math.random()*lucks.length)];
+  const ln=Math.floor(Math.random()*9)+1;
+  const secLucky = ()=>S('✨ 행운 메시지',
+    `이번 리딩의 행운 키워드는 <b>${lk.c}</b>입니다. ${lk.d} 방향에서 좋은 에너지가 흐르며, 행운의 숫자는 <b>${ln}</b>입니다. 타로는 운명을 고정하는 것이 아니라 더 나은 선택을 위한 빛을 비추는 도구입니다. 오늘 이 리딩을 작은 실천 하나로 이어가 보세요. 별들이 당신의 여정을 응원합니다. 🌟`
+  );
+
+  // ── depth별 출력 구성 ──
+
+  // depth 1: 오늘의 운세 무료 원카드
+  if(depth===1){
+    return `<p style="margin-bottom:10px;line-height:2;color:var(--dim);font-size:.85rem;">✦ 원카드는 오늘의 핵심 에너지를 한 장으로 짚어드립니다. 더 깊은 분석은 아래 심층 리딩을 이용해보세요.</p>`
+      + sec(mainTopic) + secLucky();
+  }
+
+  // ── depth 2: 카테고리 전용 상품 ──
+  if(depth===2){
+    if(forcedTopic){
+      // 카테고리 상품: 해당 주제 해석만 (월운은 sec에 전 영역 포함되어 있으므로 추가 섹션 불필요)
+      let out = sec(forcedTopic);
+      out += secLucky();
+      return out;
+    }
+
+    // ── 기본 상품 (쓰리카드·파이브카드): 수트 기반 전체 에너지 ──
+    const cardCount = drawnCards.length;
+    let out = '';
+    // 질문 타로: 질문이 있으면 질문 답 중심 해석
+    if(q){
+      out += S('💬 질문에 대한 카드의 답',
+        `"<b>${q}</b>"에 대해 ${cs} 카드가 응답했습니다. 전체 에너지는 <b>${energy}</b>입니다. `+
+        (pos
+          ? `카드는 긍정적인 흐름을 가리키고 있습니다. 지금 당신이 마음속에 품고 있는 방향이 틀리지 않았습니다. 현재 상황은 당신에게 유리하게 작용하고 있으며, 두려움보다 믿음을 선택할 때입니다. 단, 결과가 오기까지 충분한 시간과 인내가 필요합니다. 원하는 것이 가까이 있습니다. 조급함을 내려놓고 흐름을 믿으세요.`
+          : `카드는 지금 당장 원하는 답이 명확하게 나오기 어려운 흐름을 보여줍니다. 이것이 '안 된다'는 의미가 아니라, 아직 준비가 더 필요하거나 타이밍이 맞지 않는 것일 수 있습니다. 서두르기보다 현재 상황을 차분히 들여다보고, 내가 놓치고 있는 부분이 없는지 점검하세요. 역방향 에너지는 방향을 돌리라는 신호이기도 합니다. 다른 각도에서 이 질문을 바라보면 새로운 가능성이 보일 수 있습니다.`
+        )
+      );
+      // 수트 기반 보조 에너지
+      const mainArea2 = suits.includes('컵')?'love':suits.includes('완드')?'job':suits.includes('검')?'health':'money';
+      out += sec(mainArea2);
+    } else {
+      // 카드 수트 기반으로 주요 영역 1~2개 해석
+      const mainArea = suits.includes('컵')?'love':suits.includes('완드')?'job':suits.includes('검')?'health':'money';
+      out += sec(mainArea);
+      if(cardCount>=5){
+        const secondMap = {love:'job',job:'money',health:'love',money:'health'};
+        out += sec(secondMap[mainArea]||'love');
+      }
+    }
+    out += secLucky();
+    return out;
+  }
+
+  // depth 3: 프리미엄 리딩
+  const revC=revCount; const totC=drawnCards.length;
+  const prodLabel = product?.name||'프리미엄 리딩';
+  const openPara=`<p style="margin-bottom:18px;line-height:2.1;">${prodLabel}에서 ${cs} 카드가 펼쳐졌습니다. 총 ${totC}장 중 정방향 ${totC-revC}장, 역방향 ${revC}장으로 전체 에너지는 <b>${energy}</b>입니다. ${totC-revC>revC?'전반적으로 순풍이 불고 있으나, 역방향 카드가 가리키는 영역에서 내면 점검이 필요합니다.':'지금은 내면 정리와 재충전이 먼저 필요한 시기입니다. 역방향은 나쁜 신호가 아니라 더 깊은 변화를 준비하는 에너지입니다.'}</p>`;
+  const closePara=`<p style="line-height:2.1;font-style:italic;border-top:1px solid var(--border);padding-top:16px;margin-top:6px;">카드는 당신의 미래를 결정하는 것이 아니라, 지금 이 순간 가장 필요한 통찰을 보여줍니다. 이번 리딩에서 등장한 카드들이 공통적으로 말하는 것은 — <b>당신은 이미 답을 알고 있다</b>는 것입니다. 그 내면의 목소리를 신뢰하는 용기를 내세요. 🌟</p>`;
+
+  // 프리미엄 단일 주제 심층 섹션 생성기
+  function secPremium(topic) {
+    switch(topic) {
+      case 'love': return (
+        S('💞 현재 연애 에너지 심층 분석',
+          `${key1}${key2!==key1?`, ${key2}`:''} 카드가 지금 당신의 연애 에너지를 여섯 장으로 깊이 펼쳐 보여줍니다. 전체 흐름은 <b>${energy}</b>입니다. `+
+          (pos
+            ? `지금 당신의 연애 에너지는 과거의 상처를 딛고 새로운 빛을 향해 나아가는 흐름 위에 있습니다. 감정의 파동이 점차 안정되면서, 이전에는 보이지 않았던 상대의 진심이나 관계의 본질이 서서히 선명해지는 시기입니다. 솔로라면 — 가까운 시일 안에 예상치 못한 경로로 인연의 기운이 접근하고 있습니다. 평소 자주 가던 공간, 혹은 지인을 통한 소개나 온라인 공간에서 새로운 만남의 씨앗이 싹틀 가능성이 높습니다. 중요한 것은 이 시기에 당신 스스로가 감정적으로 열려 있어야 한다는 것입니다. 너무 완벽한 상대를 기대하기보다, 함께 성장할 수 있는 사람에게 마음의 문을 열어두세요. 연애 중이라면 — 두 사람 사이의 에너지가 지금 중요한 전환점을 맞이하고 있습니다. 단순한 설렘을 넘어 깊은 신뢰와 유대로 나아갈 수 있는 결정적인 시기입니다. 이 타이밍에 그동안 말하지 못했던 감정이나 바람을 솔직하게 꺼내놓는다면, 관계는 한 단계 더 깊어질 수 있습니다.`
+            : `지금 당신의 연애 에너지는 복잡하게 얽힌 감정의 실타래를 풀어가는 과정 중에 있습니다. 표면적으로는 잔잔해 보이지만, 내면 깊은 곳에서 말하지 못한 감정들이 쌓여있을 가능성이 있습니다. 솔로라면 — 지금은 새로운 연애를 적극적으로 추구하기보다 자신의 내면을 먼저 정리하는 시간이 필요합니다. 과거 관계에서의 상처나 패턴이 아직 정리되지 않았다면, 그것이 새로운 인연의 흐름을 막는 원인이 될 수 있습니다. 자기 자신을 가장 사랑하는 사람이 되는 것이 지금 가장 강력한 연애 준비입니다. 연애 중이라면 — 두 사람 사이에 해소되지 않은 오해나 기대치 차이가 있을 수 있습니다. 지금 당장 답을 요구하거나 결론을 내리려 하기보다, 충분한 공간과 시간을 두고 서로의 마음을 들여다보는 여유가 필요합니다.`
+          )+`${suitNote}`
+        )+
+        S('🌹 관계 심층 패턴 · 가까운 미래 방향',
+          `${key3} 카드가 두 사람 관계의 숨겨진 패턴과 앞으로의 방향을 가리킵니다. `+
+          (pos
+            ? `관계 안에서 반복되어온 긍정적인 패턴이 이 시기에 더욱 강화됩니다. 두 사람 모두 이 관계에서 성장하고 싶다는 욕구를 가지고 있으며, 그 방향이 서로 맞닿아 있습니다. 앞으로 한 달에서 두 달 사이에 관계의 흐름을 바꿀 수 있는 중요한 대화나 사건이 찾아올 가능성이 있습니다. 그 순간을 두려워하지 말고 진심을 담아 표현하세요. 지금 이 관계에서 당신이 줄 수 있는 가장 큰 선물은 솔직함입니다. 또한 상대의 사랑의 언어가 당신과 다를 수 있음을 이해하고, 그 방식을 존중하는 것이 관계를 더 깊게 만드는 핵심입니다.`
+            : `지금 이 관계 안에는 반복되는 부정적인 패턴이 있을 수 있습니다. 같은 주제로 다투거나, 한쪽이 과도하게 맞춰가거나, 감정을 억누르는 구도가 지속되고 있다면 지금이 그 패턴을 직면하고 변화시킬 타이밍입니다. 앞으로의 방향은 두 사람이 얼마나 솔직하고 용기 있게 이 패턴을 인식하고 대화하느냐에 달려있습니다. 감정의 무게가 느껴진다면 전문 커플 상담이나 관계 코칭도 좋은 선택이 될 수 있습니다. 이 관계가 끝이 아니라 새로운 시작을 위한 전환점에 서 있음을 기억하세요.`
+          )
+        )
+      );
+      case 'money': return (
+        S('💰 재물 에너지 심층 분석 · 현재 흐름',
+          `${key1}${key2!==key1?`, ${key2}`:''} 카드가 지금 당신의 재물 에너지를 여섯 장으로 깊이 펼쳐 보여줍니다. 전체 흐름은 <b>${energy}</b>입니다. `+
+          (pos
+            ? `지금 당신의 재물 에너지는 서서히 상승 기류를 타기 시작하고 있습니다. 오랫동안 씨앗을 뿌려온 노력이 드디어 눈에 보이는 결실로 이어질 수 있는 흐름이 감지됩니다. 단기적인 수입 증가뿐 아니라, 중장기적인 재정 안정의 토대가 지금 만들어지고 있습니다. 부업, 추가 수입원 개발, 또는 오랫동안 받지 못했던 대금이나 보상이 들어올 가능성도 있습니다. 이 시기에 가장 중요한 것은 들어온 돈을 어떻게 관리하느냐입니다. 충동적인 소비보다 목적이 명확한 지출과 일부 저축의 습관이 이 좋은 흐름을 지속시킵니다. 투자에 관심이 있다면 철저한 공부와 소액 분산 투자로 시작하되, 지인의 권유나 불확실한 정보에 의존하는 투자는 피하세요.`
+            : `현재 재정 에너지가 다소 막히거나 유출이 많은 흐름이 감지됩니다. 지출이 수입을 앞서거나, 예상치 못한 비용이 연달아 발생하는 패턴이 있을 수 있습니다. 이 시기에 가장 먼저 해야 할 것은 돈의 흐름을 정확하게 파악하는 것입니다. 가계부나 지출 앱을 통해 매일의 소비 패턴을 확인하고, 고정 지출 중 줄일 수 있는 항목을 찾아보세요. 지인이나 가족 간의 금전 거래, 보증, 연대 책임은 이 시기에 특히 신중해야 합니다. 투자보다 먼저 비상금 확보를 최우선 과제로 삼으세요. 지금의 어려운 흐름은 반드시 지나갑니다. 지출을 최소화하고 버텨내는 것이 지금 당신의 가장 현명한 재물 전략입니다.`
+          )+suitNote
+        )+
+        S('🔑 재물 장벽 · 투자 타이밍 · 장기 방향',
+          `${key3} 카드가 당신의 재물 흐름을 막는 근본 원인과 앞으로의 부의 방향을 가리킵니다. `+
+          (pos
+            ? `재물 에너지의 장벽은 내면적인 두려움이나 돈에 대한 무의식적인 신념에서 비롯될 때가 많습니다. '나는 돈을 모을 자격이 없다', '큰돈은 나와 거리가 멀다' 같은 잠재의식이 있다면 지금이 그것을 인식하고 해소할 시간입니다. 투자 타이밍은 이 시기부터 3개월 이내가 작은 시도를 해보기에 에너지적으로 유리합니다. 단, 검증된 방법을 충분히 공부한 후 소액으로 시작하고, 레버리지나 빚을 이용한 투자는 지금 단계에서는 피하는 것이 좋습니다. 장기적인 부의 방향은 당신의 재능과 전문성을 수익화하는 쪽에서 가장 강한 에너지가 감지됩니다.`
+            : `지금 재물이 막히는 근본 원인 중 하나는 에너지 분산입니다. 여러 곳에 동시에 투자하거나 계획 없이 지출하는 패턴이 돈을 새어나가게 하고 있을 수 있습니다. 지금 당장 수익을 높이는 것보다 지출을 줄이고 재정 구조를 단순하게 만드는 것이 우선입니다. 투자는 지금 시기가 아닙니다. 최소 3개월간은 현금 유동성을 최우선으로 확보하세요. 장기적으로는 한 가지 전문 분야를 깊게 파고드는 것이 재물 에너지를 회복하는 가장 확실한 방법입니다.`
+          )
+        )
+      );
+      case 'job': return (
+        S('🎯 진로 에너지 심층 분석 · 현재 방향',
+          `${key1}${key2!==key1?`, ${key2}`:''} 카드가 지금 당신의 진로 에너지를 여섯 장으로 깊이 펼쳐 보여줍니다. 전체 흐름은 <b>${energy}</b>입니다. `+
+          (pos
+            ? `지금 당신의 진로 에너지는 그동안 쌓아온 실력과 경험이 드디어 빛을 발할 수 있는 흐름 위에 있습니다. 오랫동안 지속해온 노력이 주변에 인정받거나, 새로운 기회의 문이 열리는 신호가 감지됩니다. 이직을 고민 중이라면 — 지금이 바로 그 결단을 내릴 에너지적으로 좋은 타이밍입니다. 너무 오래 고민하면 기회가 지나갈 수 있습니다. 당신의 시장 가치를 스스로 너무 낮게 평가하지 마세요. 지금 당신이 생각하는 것보다 당신의 가능성은 훨씬 더 크고 넓습니다. 창업이나 새로운 프로젝트를 시작하고 싶다면 — 소규모 테스트로 먼저 검증하고 확장하는 전략이 이 흐름에 맞습니다. 귀인과의 만남이나 중요한 네트워킹 기회가 가까이 있으니 새로운 모임이나 환경에 적극적으로 나가세요.`
+            : `지금 진로 에너지가 정체되어 있거나 방향이 흐릿한 느낌이 드는 시기입니다. 원하는 결과가 오지 않는다고 해서 그것이 당신의 한계를 의미하지 않습니다. 지금은 방향을 재정비하고 자신의 진짜 강점이 무엇인지 다시 들여다볼 시간입니다. 현재 직장이나 상황에서 불만이 크더라도, 지금 당장 큰 변화를 감행하기보다는 충분히 준비하고 내공을 쌓은 후 움직이는 것이 유리합니다. 전문성을 강화하거나 자격증, 포트폴리오를 정비하는 것이 지금 당신이 할 수 있는 가장 현명한 진로 투자입니다.`
+          )+suitNote
+        )+
+        S('🔭 숨겨진 재능 · 기회의 타이밍 · 돌파구',
+          `${key3} 카드가 당신 안에 잠재된 재능과 앞으로 기회가 오는 타이밍을 가리킵니다. `+
+          (pos
+            ? `당신 안에는 아직 충분히 활용되지 못한 핵심 역량이 있습니다. 스스로 당연하게 여겨 크게 의식하지 않는 능력 — 그것이 바로 당신만의 차별화된 강점일 가능성이 높습니다. 앞으로 1~3개월 이내에 중요한 기회가 찾아올 에너지가 감지됩니다. 그 기회는 생각지 못한 인연이나 인터넷, 지인 소개 등 다양한 경로로 올 수 있습니다. 기회가 왔을 때 망설이기보다 작게라도 먼저 시도해보는 용기가 지금 당신에게 가장 필요한 자세입니다. 진로의 돌파구는 완전히 새로운 것에 있기보다, 지금 가진 것을 다른 방식으로 활용하는 데서 나올 가능성이 높습니다.`
+            : `진로의 돌파구를 찾지 못하는 이유 중 하나는 너무 좁은 범위 안에서 가능성을 탐색하기 때문일 수 있습니다. 지금까지와는 다른 분야나 역할에 관심을 가져보세요. 당신의 기존 경험이 전혀 다른 산업에서 훨씬 가치 있게 쓰일 수 있습니다. 기회가 오는 타이밍은 지금부터 2~4개월 후가 에너지적으로 움직이기에 더 유리합니다. 그때까지 자신의 역량을 갈고 닦으며 철저히 준비하세요. 두려움이 아닌 성장의 관점에서 지금의 정체기를 바라보면, 이 시기가 얼마나 소중한 내공 축적의 시간인지 알게 될 것입니다.`
+          )
+        )
+      );
+      case 'health': return (
+        S('🌿 건강 에너지 심층 분석 · 몸과 마음의 현재 상태',
+          `${key1}${key2!==key1?`, ${key2}`:''} 카드가 지금 당신의 건강 에너지를 여섯 장으로 깊이 점검합니다. 전체 흐름은 <b>${energy}</b>입니다. `+
+          (pos
+            ? `전반적인 신체 에너지와 활력이 안정적이고 회복 중인 흐름입니다. 그동안 몸이 보내는 신호들을 잘 들어왔고, 그에 맞게 생활 습관을 조율하려는 노력이 지금의 좋은 에너지를 만들고 있습니다. 특히 이 시기에 시작하는 새로운 건강 습관 — 규칙적인 운동, 균형 잡힌 식단, 충분한 수면 — 은 앞으로의 건강에 장기적으로 큰 도움이 됩니다. 정신 건강 면에서도 비교적 안정적인 상태이지만, 내면 깊은 곳에 쌓여있는 감정의 무게가 있다면 표현하거나 방출하는 것이 좋습니다. 억누른 감정은 몸의 특정 부위에 긴장이나 통증으로 나타날 수 있습니다. 지금의 좋은 흐름을 유지하기 위해 과로와 수면 부족은 반드시 피하세요. 몸은 당신에게 솔직합니다. 피로 신호가 오면 바로 쉬는 용기를 내세요.`
+            : `몸과 마음 모두에서 피로와 긴장이 누적되어 있는 흐름이 감지됩니다. 억지로 버티거나 '이 정도는 괜찮다'고 무시해온 작은 신호들이 지금 표면으로 올라오려 하고 있습니다. 지금 당장 페이스를 줄이고 충분한 휴식을 취하는 것이 가장 중요한 건강 처방입니다. 미뤄온 건강 검진, 통증이나 불편감이 있다면 반드시 전문의와 상담하세요. 특히 소화기계, 면역계, 수면의 질에 주의가 필요한 에너지가 보입니다. 정신 건강 면에서는 고립되지 않는 것이 중요합니다. 혼자 모든 것을 감당하려 하지 말고 주변의 도움을 요청하거나 전문 상담을 고려해보세요. 음식은 자연 식품 위주로, 가공식품과 카페인은 줄이고, 수분을 충분히 섭취하세요.`
+            )+` ⚕️ <span style="font-size:.8rem;opacity:.7;">※ 타로 리딩은 의학적 진단을 대신하지 않습니다. 건강 이상은 반드시 전문의와 상담하세요.</span>${suitNote}`
+        )+
+        S('✨ 건강 회복 방향 · 정신적 균형',
+          `${key3} 카드가 앞으로의 건강 회복 방향과 정신적 균형의 열쇠를 가리킵니다. `+
+          (pos
+            ? `지금 몸이 회복을 향해 나아가는 긍정적인 흐름 위에 있습니다. 이 흐름을 가속화하는 가장 효과적인 방법은 스트레스 원인을 하나씩 제거하거나 관리하는 것입니다. 과로가 주된 원인이라면 업무 경계 설정을, 감정적 소진이 원인이라면 정서적 지지를 구하는 것이 회복의 핵심입니다. 정신적 균형을 위해 이 시기에 명상, 자연 속 산책, 가벼운 스트레칭을 꾸준히 실천해보세요. 내면이 편안해질수록 몸의 회복 속도도 빨라집니다. 앞으로 1~2개월 안에 컨디션이 눈에 띄게 좋아지는 흐름이 감지됩니다.`
+            : `건강 회복을 위해 지금 가장 필요한 것은 완전한 휴식입니다. 일시적으로 속도를 늦추고, 몸이 회복할 수 있는 충분한 시간과 공간을 허락하세요. 정신적 균형의 열쇠는 지금 당신을 가장 지치게 하는 관계나 상황을 직면하고 정리하는 데 있습니다. 회피하기보다 직면했을 때 오히려 몸도 마음도 가벼워지는 것을 경험할 수 있습니다. 자연 치유력을 믿고, 몸의 신호에 귀를 기울이는 것이 지금 당신에게 가장 강력한 건강 처방입니다.`
+          )
+        )
+      );
+      case 'character': return (
+        secCharacter()+
+        S('🔑 숨겨진 내면의 패턴 · 성장 방향',
+          `${key3} 카드가 당신이 아직 충분히 인식하지 못한 내면 패턴과 앞으로의 성장 방향을 가리킵니다. `+
+          (pos
+            ? `당신 안에는 아직 개발되지 않은 잠재력이 깊이 잠들어 있습니다. 스스로 별것 아니라고 생각하는 능력이나 성향이 실제로는 주변 사람들이 감탄하는 강점일 수 있습니다. 지금 이 시기에 자신의 강점을 다시 한번 객관적으로 정리해보세요. 성장 방향은 외부에서 인정받으려 하기보다, 자신의 내면 기준을 세우고 그것을 향해 나아가는 데 있습니다. 타인의 시선보다 내 마음이 진정으로 원하는 것에 집중하는 연습이 지금 당신에게 가장 중요한 성장 과제입니다. 자기 자신을 온전히 받아들이고 사랑하는 것이 모든 변화의 출발점입니다.`
+            : `당신이 반복적으로 경험하는 어려움이나 패턴 뒤에는, 아직 완전히 해소되지 않은 오래된 상처나 신념이 있을 수 있습니다. 그것을 직면하는 것이 두렵지만, 그 두려움을 통과했을 때 비로소 자유로워집니다. 성장 방향은 완벽해지려는 노력보다, 있는 그대로의 자신을 인정하고 받아들이는 데서 시작됩니다. 지금 당신에게 일기 쓰기, 상담, 명상 등 내면을 들여다보는 활동을 강력히 권합니다. 자기 이해가 깊어질수록 인간관계와 삶의 질이 함께 높아집니다.`
+          )
+        )
+      );
+      default: return sec(topic);
+    }
+  }
+
+  const isYearly = forcedTopic==='yearly';
+  if(isYearly){
+    return openPara + sec('yearly') + sec('love') + sec('money') + sec('job') + sec('health') + secLucky() + closePara;
+  }
+  // 프리미엄 단일 카테고리 (나의성격·본성, 프리미엄 연애운, 재물운, 진로운, 건강운)
+  const isFullReading = /풀리딩/.test(pname);
+  if(forcedTopic && !isFullReading){
+    return openPara + secPremium(forcedTopic) + secLucky() + closePara;
+  }
+  // 프리미엄 풀리딩 — 전 영역 종합
+  return openPara + secCharacter() + sec('love') + sec('money') + sec('job') + sec('health') + secLucky() + closePara;
+}
+
+function showResults(){
+  const isFreeReading = currentProduct?.freeFirst && isFreePending();
+  if(isFreeReading) store.set('tarot_free','true');
+  // 유료 상품 결제 소진 (1회 사용 후 제거)
+  if(currentProduct && currentProduct.price>0 && isPaidFor(currentProduct.id)){
+    store.del('paid_'+currentProduct.id);
+  }
+  incCount();
+  updateBadge();
+
+  // 결과 화면 제목: 상품명 + 결과
+  const titleEl=$('result-screen-title');
+  if(titleEl) titleEl.textContent=(currentProduct?.name||'타로')+' 결과';
+
+  // 택일운 날짜
+  const mv1=($('moving-date1')||{}).value||'';
+  const mv2=($('moving-date2')||{}).value||'';
+  const movingDates=(mv1||mv2)?{d1:mv1,d2:mv2}:null;
+
+  // 질문 타로 상품이면 입력된 질문 읽기
+  const q = (currentProduct?.hasQuestion && $('q-text-input')?.value.trim()) || '';
+  const sp=SPREADS[currentProduct?.cards||1]||SPREADS[3];
+  const cardCount = currentProduct?.cards||1;
+  const price = currentProduct?.price||0;
+  // 해석 깊이: 1=원카드무료, 2=일반유료, 3=심층(6장이상 or 12900원 이상)
+  const depth = isFreeReading ? 1 : (cardCount>=6||price>=12900) ? 3 : 2;
+
+  let html='';
+  drawn.forEach(({ci,rev,slot})=>{
+    const c=TAROT[ci];
+    const pos=sp.positions[slot];
+    const baseMean=rev?c.reversed:c.upright;
+    const ctxMean=posContext(pos,c.kr,rev);
+    // depth 3(심층)일 때는 카드 해석 문단 추가
+    const extraMean = depth===3 ? `<div class="rmean" style="margin-top:8px;color:var(--text);font-size:.84rem;">${cardDeepMean(c,rev,pos)}</div>` : '';
+    html+=`<div class="rcard">
+      <div class="rcard-inner">
+        <div class="rcard-art" style="background:${c.color}">
+          ${c.img?`<img src="${c.img}" alt="${c.kr}" class="${rev?'rev':''}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
+          <div style="display:${c.img?'none':'flex'};flex-direction:column;align-items:center;gap:3px;${rev?'transform:rotate(180deg)':''}">
+            <div class="asym">${c.symbol}</div>
+            <div class="anum">${c.num}</div>
+            <div class="asuit">${c.suit}</div>
+          </div>
+        </div>
+        <div class="rcard-txt">
+          <div class="rpos">✦ ${pos} ✦</div>
+          <div class="rname">${c.name}</div>
+          <div class="rkr">${c.kr}</div>
+          <span class="rori ${rev?'rv':'up'}">${rev?'역방향':'정방향'}</span>
+          <div class="rmean">${ctxMean}</div>
+          <div class="rmean" style="margin-top:8px;color:var(--dim);font-size:.82rem;">${baseMean}</div>
+          ${extraMean}
+          <div class="rkws">${c.keys.map(k=>`<span class="rkw">#${k}</span>`).join('')}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  const overallHtml=generateOverall(drawn,sp,q,depth,currentProduct,movingDates);
+  html+=`<div class="overall-box"><h3>✦ 종합 해석 ✦</h3>${overallHtml}</div>`;
+
+  // 무료 리딩 후 유료 유도 CTA
+  if(isFreeReading){
+    const prods=getProducts().filter(p=>p.price>0).slice(0,3);
+    html+=`<div class="upsell-box">
+      <div class="upsell-title">🔮 더 깊은 분석이 필요하신가요?</div>
+      <div class="upsell-sub">원카드는 오늘의 방향을 보여주는 첫 단계입니다.<br>더 정확하고 심층적인 타로 리딩을 경험해보세요.</div>
+      <div class="upsell-list">
+        ${prods.map(p=>`<button class="upsell-btn" onclick="goHome();setTimeout(()=>buyProduct('${p.id}'),100)">
+          <span class="upsell-emoji">${p.emoji}</span>
+          <span class="upsell-info"><b>${p.name}</b><br><small>${p.desc.slice(0,22)}…</small></span>
+          <span class="upsell-price">${formatPrice(p.price)}</span>
+        </button>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  html+=`<button class="btn-again" onclick="goHome()">🏠 홈으로 돌아가기</button>`;
+
+  $('result-body').innerHTML=html;
+  setScreen('screen-result');
+}
+
+function goHome(){setScreen('screen-home');renderHome();}
+
+// ══════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════
+// 관리자
+// ══════════════════════════════════════════════════════
+function openAdmin(){
+  $('admin-login-form').classList.remove('hidden');
+  $('admin-content').classList.add('hidden');
+  $('admin-pw-input').value='';
+  setScreen('screen-admin');
+}
+
+// 관리자 기본 비밀번호 (관리자 패널에서 변경하면 브라우저에 저장됨)
+const ADMIN_PW_DEFAULT = 'tjgus6192@@';
+
+function getAdminPw(){ return store.get('admin_pw') || ADMIN_PW_DEFAULT; }
+
+function checkAdminPw(){
+  if($('admin-pw-input').value === getAdminPw()){
+    showAdminContent();
+  } else {
+    alert('비밀번호가 틀렸습니다.');
+    $('admin-pw-input').value='';
+  }
+}
+
+function showAdminContent(){
+  $('admin-login-form').classList.add('hidden');
+  $('admin-content').classList.remove('hidden');
+  refreshStats();
+  renderProdManage();
+  loadSettings();
+  loadBizInfo();
+}
+
+function closeAdmin(){goHome();}
+
+function switchAdminTab(name,btn){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  $(`tab-${name}`).classList.add('active');
+}
+
+function refreshStats(){
+  const fu=store.get('tarot_free')==='true';
+  const prods=getProducts();
+  const paidProds=prods.filter(p=>isPaidFor(p.id));
+  $('st-free').textContent=fu?'사용 완료':'미사용';
+  $('st-free').className='a-stat-val '+(fu?'red-txt':'green-txt');
+  $('st-paid').textContent=paidProds.length>0?`${paidProds.length}개 이용권 대기`:'없음';
+  $('st-paid').className='a-stat-val '+(paidProds.length>0?'blue-txt':'red-txt');
+  $('st-exp').textContent=paidProds.length>0?paidProds.map(p=>p.name).join(', '):'없음';
+  $('st-count').textContent=(store.get('tarot_count')||'0')+'회';
+}
+
+function adminResetFree(){store.del('tarot_free');updateBadge();refreshStats();alert('✅ 무료 횟수 초기화');}
+function adminGrantFree(){store.del('tarot_free');updateBadge();refreshStats();alert('✅ 무료 1회 지급');}
+function adminGrantPaid(){
+  // 모든 상품에 테스트 이용권 부여
+  getProducts().filter(p=>p.price>0).forEach(p=>store.set('paid_'+p.id,'true'));
+  updateBadge();refreshStats();alert('✅ 전체 상품 테스트 이용권 지급');
+}
+function adminRevokePaid(){
+  getProducts().forEach(p=>store.del('paid_'+p.id));
+  updateBadge();refreshStats();alert('✅ 이용권 전체 회수');
+}
+function adminChangePw(){
+  const np=$('new-pw').value.trim();
+  if(!np){alert('비밀번호를 입력하세요');return;}
+  store.set('admin_pw',np);
+  $('new-pw').value='';
+  alert('✅ 비밀번호가 변경되었습니다. 다음 로그인부터 새 비밀번호를 사용하세요.');
+}
+function adminResetAll(){
+  if(!confirm('⚠️ 모든 데이터를 초기화합니다. 계속하시겠습니까?'))return;
+  ['tarot_free','tarot_count','admin_pw','products','app_settings'].forEach(k=>store.del(k));
+  getProducts().forEach(p=>store.del('paid_'+p.id));
+  alert('✅ 초기화 완료');location.reload();
+}
+
+// ── 상품 관리 ──
+const CAT_LABEL={daily:'오늘의 운세',love:'연애운',money:'재물운',career:'진로운',health:'건강운',special:'프리미엄'};
+
+function renderProdManage(){
+  const prods=getProducts();
+  $('prod-manage-list').innerHTML=prods.map((p,i)=>`
+    <div class="prod-manage-card">
+      <div class="pmc-top">
+        <div class="pmc-thumb" style="background:${p.color}">
+          ${p.imgUrl?`<img src="${p.imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" onerror="this.style.display='none'">`:p.emoji}
+        </div>
+        <div class="pmc-info">
+          <div class="pmc-name">${p.name}</div>
+          <div class="pmc-cat">${CAT_LABEL[p.category]||p.category} · ${p.cards}장</div>
+        </div>
+        <div class="pmc-price">${formatPrice(p.price)}</div>
+      </div>
+      <div class="pmc-btns">
+        <button class="a-btn" style="padding:5px 8px;font-size:.75rem;" onclick="moveProduct('${p.id}',-1)" ${i===0?'disabled':''}>▲</button>
+        <button class="a-btn" style="padding:5px 8px;font-size:.75rem;" onclick="moveProduct('${p.id}',1)" ${i===prods.length-1?'disabled':''}>▼</button>
+        <button class="a-btn a-btn-gold" onclick="openEditForm('${p.id}')">편집</button>
+        <button class="a-btn a-btn-red" onclick="deleteProduct('${p.id}')">삭제</button>
+      </div>
+    </div>`).join('');
+}
+
+function moveProduct(id, dir){
+  const prods=getProducts();
+  const idx=prods.findIndex(p=>p.id===id);
+  if(idx<0) return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=prods.length) return;
+  [prods[idx],prods[newIdx]]=[prods[newIdx],prods[idx]];
+  saveProducts(prods);
+  renderProdManage();
+  renderProducts(); // 홈 그리드도 즉시 반영
+  showToast('순서 저장됨 ✓');
+}
+
+function showToast(msg){
+  let t=$('_toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='_toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#3a1060;color:#fff;padding:8px 18px;border-radius:20px;font-size:.8rem;z-index:9999;pointer-events:none;transition:opacity .4s;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.opacity='1';
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+function openNewProductForm(){
+  $('edit-prod-id').value='';
+  $('edit-name').value='';
+  $('edit-img-url').value='';
+  $('edit-emoji').value='🔮';
+  $('edit-cat').value='basic';
+  $('edit-cards').value='3';
+  $('edit-price').value='3900';
+  $('edit-desc').value='';
+  $('edit-free').value='false';
+  updateImgPreviewUrl('');
+  const f=$('prod-edit-form');f.classList.add('open');f.scrollIntoView({behavior:'smooth'});
+}
+
+function openEditForm(id){
+  const p=getProducts().find(x=>x.id===id);if(!p)return;
+  $('edit-prod-id').value=p.id;
+  $('edit-name').value=p.name;
+  $('edit-img-url').value=p.imgUrl||'';
+  $('edit-emoji').value=p.emoji||'🔮';
+  $('edit-cat').value=p.category==='future'?'fortune':p.category;
+  $('edit-cards').value=String(p.cards);
+  $('edit-price').value=String(p.price);
+  $('edit-desc').value=p.desc;
+  $('edit-free').value=String(p.freeFirst||false);
+  updateImgPreviewUrl(p.imgUrl||'');
+  const f=$('prod-edit-form');f.classList.add('open');f.scrollIntoView({behavior:'smooth'});
+}
+
+function cancelEditForm(){$('prod-edit-form').classList.remove('open');}
+
+function updateImgPreviewUrl(url){
+  const box=$('img-preview-box');
+  if(url){box.innerHTML=`<img src="${url}" onerror="this.parentElement.innerHTML='${$('edit-emoji').value||'🔮'}'">`;}
+  else{box.textContent=$('edit-emoji').value||'🔮';}
+}
+
+function handleImgUpload(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const url=e.target.result;
+    $('edit-img-url').value=url;
+    updateImgPreviewUrl(url);
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProduct(){
+  const id=$('edit-prod-id').value||('p'+Date.now());
+  const prod={
+    id,
+    name:$('edit-name').value||'타로 서비스',
+    imgUrl:$('edit-img-url').value||'',
+    emoji:$('edit-emoji').value||'🔮',
+    category:$('edit-cat').value,
+    cards:parseInt($('edit-cards').value)||1,
+    price:parseInt($('edit-price').value)||0,
+    desc:$('edit-desc').value||'',
+    freeFirst:$('edit-free').value==='true',
+    color:'linear-gradient(135deg,#2a1060,#1a0040)',
+  };
+  let prods=getProducts();
+  const idx=prods.findIndex(p=>p.id===id);
+  if(idx>=0)prods[idx]=prod;else prods.push(prod);
+  saveProducts(prods);
+  cancelEditForm();
+  renderProdManage();
+  renderProducts();
+  alert('✅ 상품이 저장되었습니다.');
+}
+
+function deleteProduct(id){
+  if(!confirm('이 상품을 삭제하시겠습니까?'))return;
+  let prods=getProducts().filter(p=>p.id!==id);
+  saveProducts(prods);
+  renderProdManage();
+  renderProducts();
+}
+
+// ── 앱 설정 ──
+function applySettings(){
+  const s=store.getObj('app_settings')||{};
+  const logoEl=document.querySelector('.header-logo span');
+  const logoIcon=document.querySelector('.header-logo .logo-icon');
+  const bannerEl=$('banner-title-el');
+  const subEl=$('banner-sub-el');
+  if(s.appName&&logoEl) logoEl.textContent=s.appName;
+  if(logoIcon){
+    if(s.logoImg){
+      logoIcon.innerHTML=`<img src="${s.logoImg}" style="width:100%;height:100%;object-fit:cover;border-radius:7px;">`;
+    } else {
+      logoIcon.innerHTML='<span class="logo-s">S</span>';
+    }
+  }
+  if(s.bannerTitle!=null&&s.bannerTitle!==''&&bannerEl)
+    bannerEl.innerHTML=s.bannerTitle.replace(/\n/g,'<br>');
+  if(s.bannerSub!=null&&s.bannerSub!==''&&subEl)
+    subEl.textContent=s.bannerSub;
+}
+
+function loadSettings(){
+  const s=store.getObj('app_settings')||{};
+  if(s.logoImg&&$('logo-img-input')) $('logo-img-input').value=s.logoImg;
+  if(s.appName&&$('app-name-input')) $('app-name-input').value=s.appName;
+  if(s.bannerTitle&&$('banner-title-input')) $('banner-title-input').value=s.bannerTitle;
+  if(s.bannerSub&&$('banner-sub-input')) $('banner-sub-input').value=s.bannerSub;
+}
+
+function saveSettings(){
+  const s={
+    logoImg:$('logo-img-input').value.trim(),
+    appName:$('app-name-input').value,
+    bannerTitle:$('banner-title-input').value,
+    bannerSub:$('banner-sub-input').value,
+  };
+  store.setObj('app_settings',s);
+  applySettings();
+  alert('✅ 설정이 저장되었습니다.');
+}
+
+function loadBizInfo(){
+  const b=store.getObj('biz_info')||{};
+  ['biz-name','biz-ceo','biz-reg','biz-mail','biz-addr','biz-email'].forEach(id=>{
+    const key=id.replace('-','_').replace('-','_');
+    if($( id)) $(id).value=b[key]||'';
+  });
+  if($('terms-input')) $('terms-input').value=b.terms||'';
+  if($('privacy-input')) $('privacy-input').value=b.privacy||'';
+  if($('refund-input')) $('refund-input').value=b.refund||'';
+}
+
+function saveBizInfo(){
+  const b={
+    biz_name:$('biz-name').value.trim(),
+    biz_ceo:$('biz-ceo').value.trim(),
+    biz_reg:$('biz-reg').value.trim(),
+    biz_mail:$('biz-mail').value.trim(),
+    biz_addr:$('biz-addr').value.trim(),
+    biz_email:$('biz-email').value.trim(),
+    terms:$('terms-input').value.trim(),
+    privacy:$('privacy-input').value.trim(),
+    refund:$('refund-input').value.trim(),
+  };
+  store.setObj('biz_info',b);
+  applyBizInfo();
+  alert('✅ 사업자 정보 및 약관이 저장되었습니다.');
+}
+
+function applyBizInfo(){
+  const b=store.getObj('biz_info')||{};
+  const el=$('home-footer');
+  if(!el) return;
+  const hasBiz=b.biz_name||b.biz_reg||b.biz_email;
+  if(!hasBiz && !b.terms && !b.privacy && !b.refund){el.style.display='none';return;}
+  el.style.display='block';
+  let html='';
+  if(b.terms||b.privacy||b.refund){
+    html+=`<div class="footer-links">`;
+    if(b.terms) html+=`<span class="footer-link" onclick="showPolicy('terms')">이용약관</span>`;
+    if(b.privacy) html+=`<span class="footer-link" onclick="showPolicy('privacy')">개인정보처리방침</span>`;
+    if(b.refund) html+=`<span class="footer-link" onclick="showPolicy('refund')">환불·취소 규정</span>`;
+    html+=`</div>`;
+  }
+  if(hasBiz){
+    html+=`<div class="footer-biz">`;
+    if(b.biz_name) html+=`상호명: ${b.biz_name}`;
+    if(b.biz_ceo) html+=` · 대표: ${b.biz_ceo}`;
+    if(b.biz_reg) html+=`<br>사업자등록번호: ${b.biz_reg}`;
+    if(b.biz_mail) html+=`<br>통신판매업 신고번호: ${b.biz_mail}`;
+    if(b.biz_addr) html+=`<br>주소: ${b.biz_addr}`;
+    if(b.biz_email) html+=`<br>이메일: ${b.biz_email}`;
+    html+=`</div>`;
+  }
+  el.innerHTML=html;
+}
+
+function showPolicy(type){
+  const b=store.getObj('biz_info')||{};
+  const titles={terms:'이용약관',privacy:'개인정보처리방침',refund:'환불·취소 규정'};
+  const content=b[type]||'';
+  if(!content){alert('내용이 없습니다. 관리자 모드에서 입력해주세요.');return;}
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;overflow-y:auto;padding:20px 16px;';
+  overlay.innerHTML=`<div style="max-width:480px;margin:0 auto;background:#1a1030;border-radius:16px;padding:24px 20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:1rem;font-weight:700;color:var(--gold);">${titles[type]}</span>
+      <span onclick="this.closest('[style*=fixed]').remove()" style="font-size:1.4rem;cursor:pointer;color:var(--dim);">✕</span>
+    </div>
+    <div style="font-size:.82rem;line-height:1.9;color:var(--text);white-space:pre-wrap;">${content.replace(/</g,'&lt;')}</div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+// ══════════════════════════════════════════════════════
+// 초기화 — 상품 버전 마이그레이션
+// ══════════════════════════════════════════════════════
+(function migrateProducts(){
+  const PROD_VERSION = '8';
+  if(store.get('prod_version') !== PROD_VERSION){
+    store.del('products'); // 구 버전 상품 목록만 삭제 (admin_pw·app_settings 유지)
+    store.set('prod_version', PROD_VERSION);
+  }
+})();
+renderHome();
+applySettings();
+applyBizInfo();
+
+// ?admin URL 파라미터 감지 → 관리자 버튼 표시 + 패널 열기
+if(location.search.includes('admin')){
+  const btn=$('nav-admin-btn');
+  if(btn) btn.style.display='flex';
+  openAdmin();
+}
+
+// ══════════════════════════════════════════════════════
+// Supabase + 카카오 로그인
+// ══════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://jtixhlttabxwtdnskwxm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aXhobHR0YWJ4d3RkbnNrd3htIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMDExMzIsImV4cCI6MjA5NzY3NzEzMn0.YoSYihOAJM5YklazDqWbJfb4IHVnvbdxcjA8Q40cuq8';
+let supabase = null;
+try { supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e){}
+
+async function kakaoLogin(){
+  if(!window._sbClient){alert('로그인 서비스 준비 중입니다.');return;}
+  const {error} = await window._sbClient.auth.signInWithOAuth({
+    provider:'kakao',
+    options:{redirectTo: location.origin, scopes:'profile_nickname'}
+  });
+  if(error) alert('로그인 실패: '+error.message);
+}
+
+async function kakaoLogout(){
+  if(!window._sbClient) return;
+  await window._sbClient.auth.signOut();
+  updateUserBar(null);
+}
+
+function updateUserBar(user){
+  const bar = $('user-info-bar');
+  const nameEl = $('user-name-text');
+  const avatarEl = $('user-avatar');
+  const badgeBtn = $('user-badge-btn');
+  if(user){
+    const meta = user.user_metadata||{};
+    const name = meta.name||meta.full_name||'회원님';
+    const avatar = meta.avatar_url||meta.picture||'';
+    if(nameEl) nameEl.textContent = name;
+    if(avatarEl){ avatarEl.src=avatar; avatarEl.style.display=avatar?'block':'none'; }
+    if(bar) bar.style.display='flex';
+    if(badgeBtn) badgeBtn.textContent = name;
+  } else {
+    if(bar) bar.style.display='none';
+    if(badgeBtn) badgeBtn.textContent = '로그인';
+    if(badgeBtn) badgeBtn.onclick = kakaoLogin;
+  }
+}
+
+// 로그인 상태 감지
+if(supabase){
+  supabase.auth.getSession().then(({data:{session}})=>{
+    updateUserBar(session?.user||null);
+  });
+  supabase.auth.onAuthStateChange((_,session)=>{
+    updateUserBar(session?.user||null);
+  });
+}
+
+// 헤더 로그인 버튼 클릭 시 카카오 로그인 (Kakao JS SDK 방식)
+const badgeBtn = $('user-badge-btn');
+if(badgeBtn) badgeBtn.onclick = kakaoLogin;
+</script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
+<script>
+(function(){
+  const JS_KEY = 'becfb4ca2aaa02df7a7b6049d46e6e8c';
+  window._sbClient = true;
+  try{ if(!Kakao.isInitialized()) Kakao.init(JS_KEY); }catch(e){ console.log('Kakao SDK 로드 중'); }
+  window._sbClient = true;
+
+  window.kakaoLogin = function(){
+    location.href = '/api/auth/kakao/start';
+  };
+
+  // 카카오 콜백 처리 (?auth=ok 시 쿠키에서 사용자 정보 읽기)
+  (function handleKakaoCallback(){
+    const params = new URLSearchParams(location.search);
+    if(params.get('auth') !== 'ok') return;
+    history.replaceState(null,'',location.pathname);
+    const match = document.cookie.match(/tarot_user=([^;]+)/);
+    if(!match) return;
+    try{
+      const u = JSON.parse(decodeURIComponent(match[1]));
+      store.set('kuser', JSON.stringify(u));
+      updateUserBar({user_metadata:{name:u.name, avatar_url:u.avatar}});
+    }catch(e){}
+  })();
+
+  window.kakaoLogout = function(){
+    if(Kakao.Auth.getAccessToken()){
+      Kakao.Auth.logout(function(){ store.del('kuser'); updateUserBar(null); });
+    } else { store.del('kuser'); updateUserBar(null); }
+  };
+
+  // 버튼 연결
+  const btn = document.getElementById('user-badge-btn');
+  if(btn) btn.onclick = window.kakaoLogin;
+
+  // 저장된 로그인 복원
+  try{
+    const saved = store.get('kuser');
+    if(saved){ const u=JSON.parse(saved); updateUserBar({user_metadata:{name:u.name,avatar_url:u.avatar}}); }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

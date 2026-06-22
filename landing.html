@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>빛담사주 — 진짜 분석이 무엇인지 보여드립니다</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --navy: #0D1B2A;
+      --navy2: #152236;
+      --navy3: #1E3250;
+      --white: #FFFFFF;
+      --gray: #8A94A6;
+      --light: #F4F6FA;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 20px 60px;
+      background: linear-gradient(160deg, #0a1520 0%, #162540 50%, #0D1B2A 100%);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* 이미지 자리 — 히어로 메인 이미지 */
+    .hero-img-wrap {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      margin-bottom: 36px;
+      overflow: hidden;
+      background: var(--navy3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--gray); text-align: center; line-height: 1.5;
+    }
+    /* 이미지 준비되면: <img src="images/hero-profile.jpg" alt="빛담 강사"> */
+
+    .hero-badge {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: 3px;
+      padding: 6px 18px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(32px, 6vw, 58px);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      display: block;
+      background: linear-gradient(90deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-style: normal;
+    }
+
+    .hero p {
+      font-size: clamp(15px, 2vw, 18px);
+      color: rgba(255,255,255,0.7);
+      line-height: 1.8;
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 16px;
+      padding: 18px 48px;
+      border-radius: 4px;
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 8px 32px rgba(201,168,76,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,168,76,0.45); }
+
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+      margin-top: 64px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .stat-label { font-size: 13px; color: var(--gray); margin-top: 4px; }
+
+    /* ── SECTION BASE ── */
+    section { padding: 100px 20px; }
+
+    .inner { max-width: 960px; margin: 0 auto; }
+
+    .section-label {
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      text-align: center;
+      color: rgba(255,255,255,0.6);
+      font-size: 15px;
+      line-height: 1.9;
+      max-width: 560px;
+      margin: 0 auto 60px;
+    }
+
+    .divider {
+      width: 40px; height: 2px;
+      background: var(--gold);
+      margin: 20px auto 0;
+    }
+
+    /* ── PROBLEM ── */
+    .problem { background: var(--navy2); }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .problem-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 32px 24px;
+      position: relative;
+    }
+    .problem-card::before {
+      content: '✕';
+      position: absolute;
+      top: 20px; right: 20px;
+      color: #E05555;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .problem-card p { font-size: 15px; line-height: 1.8; color: rgba(255,255,255,0.75); }
+    .problem-card strong { display: block; font-size: 16px; margin-bottom: 8px; }
+
+    .problem-answer {
+      background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.05));
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+    }
+    .problem-answer h3 {
+      font-family: 'Noto Serif KR', serif;
+      font-size: clamp(22px, 3vw, 32px);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .problem-answer h3 span { color: var(--gold); }
+    .problem-answer p { color: rgba(255,255,255,0.65); line-height: 1.9; }
+
+    /* ── ABOUT ── */
+    .about { background: var(--navy); }
+
+    /* 이미지 자리 — 강사 자격증/소개 이미지 */
+    .about-img {
+      width: 100%; max-width: 480px;
+      height: 320px;
+      background: var(--navy3);
+      border-radius: 12px;
+      border: 1px solid rgba(201,168,76,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--gray); text-align: center; line-height: 1.8;
+      margin: 0 auto 48px;
+    }
+    /* 이미지 준비되면: <img src="images/about-cert.jpg" alt="자격증"> */
+
+    .about-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .about-list li {
+      display: flex; align-items: flex-start; gap: 14px;
+      font-size: 15px; line-height: 1.8; color: rgba(255,255,255,0.8);
+    }
+    .about-list li::before {
+      content: '✦';
+      color: var(--gold);
+      font-size: 12px;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    /* ── PRODUCTS ── */
+    .products { background: var(--navy2); }
+
+    .product-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .product-card {
+      background: var(--navy);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 36px 28px;
+      position: relative;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+
+    .product-card.featured {
+      border-color: var(--gold);
+      background: linear-gradient(160deg, #1a2d48, #0f1e30);
+    }
+
+    .product-tag {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .tag-basic { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+    .tag-premium { background: var(--gold); color: var(--navy); }
+    .tag-love { background: rgba(224,85,85,0.2); color: #F08080; border: 1px solid rgba(224,85,85,0.3); }
+
+    .product-best {
+      position: absolute;
+      top: -14px; right: 24px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+    }
+
+    .product-card h3 {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .product-sub {
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 24px;
+    }
+
+    .product-price {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+    .product-price span { font-size: 16px; font-weight: 400; }
+
+    .product-group-price {
+      font-size: 12px;
+      color: var(--gray);
+      margin-bottom: 28px;
+      line-height: 1.8;
+    }
+
+    .product-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .product-features li {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .product-features li::before { content: '✓'; color: var(--gold); font-weight: 700; }
+
+    /* ── REVIEWS ── */
+    .reviews { background: var(--navy); }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .review-card {
+      background: var(--navy2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .stars { color: var(--gold); font-size: 14px; margin-bottom: 14px; letter-spacing: 2px; }
+
+    .review-text {
+      font-size: 14px;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 20px;
+    }
+
+    .reviewer {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .reviewer-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--navy3);
+      border: 1px solid rgba(201,168,76,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .reviewer-name { font-size: 13px; font-weight: 600; }
+    .reviewer-date { font-size: 12px; color: var(--gray); }
+
+    /* ── FORM ── */
+    .form-section {
+      background: linear-gradient(160deg, var(--navy2), var(--navy));
+      padding: 100px 20px;
+    }
+
+    .form-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 20px;
+      padding: 48px 40px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #080f18;
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      line-height: 2;
+    }
+
+    /* ── FLOATING CTA ── */
+    .float-cta {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 999;
+    }
+    .float-cta a {
+      display: block;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 16px 28px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 8px 32px rgba(201,168,76,0.5);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 8px 32px rgba(201,168,76,0.5); }
+      50% { box-shadow: 0 8px 48px rgba(201,168,76,0.8); }
+    }
+
+    @media (max-width: 600px) {
+      .form-wrap { padding: 32px 20px; }
+      .hero-stats { gap: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     HERO
+════════════════════════════════ -->
+<section class="hero">
+  <!-- 이미지 자리: 강사 프로필 사진 (원형, 160×160px)
+       준비되면 아래 div를 삭제하고 img 태그로 교체:
+       <img src="images/hero-profile.jpg" style="width:160px;height:160px;border-radius:50%;border:2px solid #C9A84C;margin-bottom:36px;" alt="빛담"> -->
+  <div class="hero-img-wrap">프로필<br>사진</div>
+
+  <div class="hero-badge">B I T D A M · S A J U</div>
+
+  <h1>
+    꼰구를 잡는 소리는 안 합니다<br>
+    <em>진짜 분석이 무엇인지<br>보여드립니다</em>
+  </h1>
+
+  <p>
+    막연한 위로가 아닌, 데이터 기반의 정밀 사주 분석.<br>
+    당신의 흐름을 정확하게 짚어드립니다.
+  </p>
+
+  <a href="#form" class="btn-primary">지금 바로 사주상담 신청하기 →</a>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">4,200+</div>
+      <div class="stat-label">누적 상담 건수</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">9.8</div>
+      <div class="stat-label">평균 만족도</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">130p</div>
+      <div class="stat-label">프리미엄 PDF 분량</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════
+     PROBLEM
+════════════════════════════════ -->
+<section class="problem">
+  <div class="inner">
+    <p class="section-label">PROBLEM</p>
+    <h2 class="section-title">혹시 이런 경험 있으신가요?</h2>
+    <div class="divider" style="margin-bottom:56px;"></div>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <strong>막연한 결과에 지쳤다...</strong>
+        <p>결과가 나와도 "그래서 어쩌라고?" 싶었던 적이 있다</p>
+      </div>
+      <div class="problem-card">
+        <strong>시작만 하고 계속 제자리...</strong>
+        <p>뭔가 해보려 하는데 왜 자꾸 막히는지 이유를 모르겠다</p>
+      </div>
+      <div class="problem-card">
+        <strong>이 직무가 맞는 건지...</strong>
+        <p>일은 하고 있는데 이게 내 길이 맞는 건지 확신이 없다</p>
+      </div>
+      <div class="problem-card">
+        <strong>이 관계가 맞는 건지...</strong>
+        <p>감정은 있는데 이 사람과의 미래가 보이지 않는다</p>
+      </div>
+    </div>
+
+    <div class="problem-answer">
+      <h3>모든 문제엔 <span>이유</span>가 있습니다<br>표면만 긁어선, 아무것도 안 바뀝니다</h3>
+      <p>빛담사주는 문제의 깊이까지 내려가<br>진짜 원인과 흐름을 정확히 분석합니다</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════
+     ABOUT
+════════════════════════════════ -->
+<section class="about">
+  <div class="inner">
+    <p class="section-label">ABOUT</p>
+    <h2 class="section-title">빗담사주는<br>완전히 다릅니다</h2>
+    <div class="divider" style="margin-bottom:56px;"></div>
+
+    <!-- 이미지 자리: 자격증 또는 강사 소개 이미지 (가로형, 480×320px)
+         준비되면 이 div를 삭제하고 img 태그로 교체:
+         <img src="images/about-cert.jpg" style="width:100%;max-width:480px;display:block;margin:0 auto 48px;border-radius:12px;" alt="자격증"> -->
+    <div class="about-img">자격증 / 강사 소개<br>이미지 자리<br>(가로형 이미지)</div>
+
+    <ul class="about-list">
+      <li>단순 운세풀이가 아닌, <strong>데이터 기반의 정밀 구조 분석</strong>으로 접근합니다</li>
+      <li>1년 단기 흐름부터 10년 대운까지 <strong>시간축을 나눠 입체적으로</strong> 분석합니다</li>
+      <li>PDF 리포트로 제공되어 <strong>언제든 다시 꺼내볼 수 있습니다</strong></li>
+      <li>AI가 아닌, 직접 쓴 <strong>1:1 맞춤 분석</strong>입니다</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════
+     PRODUCTS
+════════════════════════════════ -->
+<section class="products" id="products">
+  <div class="inner">
+    <p class="section-label">PROGRAMS</p>
+    <h2 class="section-title">상담 프로그램 선택</h2>
+    <p class="section-desc">필요한 분석 깊이에 따라 선택하세요.<br>모든 상담은 PDF 리포트로 제공됩니다.</p>
+
+    <div class="product-cards">
+
+      <!-- 상품 1 -->
+      <div class="product-card">
+        <span class="product-tag tag-basic">BASIC</span>
+        <h3>실속 종합 분석</h3>
+        <p class="product-sub">기본 PDF 10p</p>
+        <div class="product-price">14,900<span>원</span></div>
+        <div class="product-group-price">
+          2인 29,800원 · 3인 44,700원 · 4인 59,600원
+        </div>
+        <ul class="product-features">
+          <li>사주 기본 구조 분석</li>
+          <li>현재 흐름 핵심 포인트</li>
+          <li>PDF 리포트 10페이지</li>
+        </ul>
+      </div>
+
+      <!-- 상품 2 (BEST) -->
+      <div class="product-card featured">
+        <span class="product-best">BEST</span>
+        <span class="product-tag tag-premium">PREMIUM</span>
+        <h3>프리미엄 고급 분석</h3>
+        <p class="product-sub">1년 + 10년 대운 · PDF 130p</p>
+        <div class="product-price">34,900<span>원</span></div>
+        <div class="product-group-price">
+          2인 64,000원(8%↓) · 3인 90,000원(14%↓) · 4인 115,000원(18%↓)
+        </div>
+        <ul class="product-features">
+          <li>사주 정밀 구조 전체 분석</li>
+          <li>1년 단기 + 10년 대운 흐름</li>
+          <li>직업 · 재물 · 관계 심층 분석</li>
+          <li>PDF 리포트 130페이지</li>
+        </ul>
+      </div>
+
+      <!-- 상품 3 -->
+      <div class="product-card">
+        <span class="product-tag tag-love">LOVE</span>
+        <h3>연애운 정밀 분석</h3>
+        <p class="product-sub">연애 성향 외 PDF 60p</p>
+        <div class="product-price">23,900<span>원</span></div>
+        <div class="product-group-price">
+          2인 47,800원 · 3인 71,700원 · 4인 95,600원
+        </div>
+        <ul class="product-features">
+          <li>나의 연애 성향 구조 분석</li>
+          <li>궁합 · 인연 흐름 분석</li>
+          <li>관계 타이밍 포인트 제시</li>
+          <li>PDF 리포트 60페이지</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════
+     REVIEWS
+════════════════════════════════ -->
+<section class="reviews">
+  <div class="inner">
+    <p class="section-label">REVIEWS</p>
+    <h2 class="section-title">실제 경험한 분들의<br>리얼 후기</h2>
+    <div class="divider" style="margin-bottom:56px;"></div>
+
+    <div class="review-grid">
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p class="review-text">
+          막연하게 불안했던 게 분석 받고 나서 정리가 됐어요.
+          왜 이 시기에 이런 일이 생기는지 이유를 알고 나니까
+          오히려 마음이 편해졌습니다.
+        </p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">김</div>
+          <div>
+            <div class="reviewer-name">김*영</div>
+            <div class="reviewer-date">프리미엄 고급 분석</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p class="review-text">
+          연애운 분석인데 단순히 "잘 된다 안 된다"가 아니라
+          내 성향이 어떻게 작용하는지까지 나와서 놀랐어요.
+          PDF 보면서 계속 "맞아 맞아" 했습니다.
+        </p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">박</div>
+          <div>
+            <div class="reviewer-name">박*진</div>
+            <div class="reviewer-date">연애운 정밀 분석</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p class="review-text">
+          시도 때도 없이 막혔던 게 흐름상 이유가 있었더라고요.
+          시기만 알아도 마음이 달라집니다.
+          확실히 일반 운세앱이랑 차원이 다릅니다.
+        </p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">최</div>
+          <div>
+            <div class="reviewer-name">최*현</div>
+            <div class="reviewer-date">프리미엄 고급 분석</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════
+     FORM
+════════════════════════════════ -->
+<section class="form-section" id="form">
+  <div class="inner">
+    <p class="section-label">APPLY</p>
+    <h2 class="section-title">지금 바로<br>사주상담 신청하기</h2>
+    <p class="section-desc">남은 자리가 얼마 없습니다.<br>지금 이 페이지에서만 특가로 진행됩니다.</p>
+
+    <div class="form-wrap">
+      <!-- 사주랩 입력폼 임베드 -->
+      <sajulab-form merchant="bitdam" page="0527"></sajulab-form>
+      <script src="https://www.sajulab.kr/js/embed.js"></script>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════
+     FOOTER
+════════════════════════════════ -->
+<footer>
+  <p>빛담사주</p>
+  <p>문의: 카카오톡 채널 @빛담사주</p>
+  <p style="margin-top:16px;">© 2025 빛담사주. All rights reserved.</p>
+</footer>
+
+
+<!-- 플로팅 CTA 버튼 -->
+<div class="float-cta">
+  <a href="#form">지금 바로 신청하기 →</a>
+</div>
+
+</body>
+</html>

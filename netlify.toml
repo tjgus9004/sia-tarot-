@@ -1,0 +1,12 @@
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/auth/kakao/start"
+  to = "/.netlify/functions/kakao-start"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/kakao/callback"
+  to = "/.netlify/functions/kakao-callback"
+  status = 200

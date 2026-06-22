@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10분 타이머</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f0f1a;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      color: #aaa;
+      margin-bottom: 48px;
+      text-transform: uppercase;
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto 48px;
+    }
+
+    svg {
+      transform: rotate(-90deg);
+      width: 300px;
+      height: 300px;
+    }
+
+    .bg-circle {
+      fill: none;
+      stroke: #1e1e2e;
+      stroke-width: 12;
+    }
+
+    .progress-circle {
+      fill: none;
+      stroke: url(#grad);
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 817;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .time-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      font-weight: 200;
+      letter-spacing: 0.05em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .controls {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 14px 36px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    button:active { transform: scale(0.96); }
+
+    .btn-start {
+      background: linear-gradient(135deg, #6c63ff, #48cfad);
+      color: #fff;
+      min-width: 130px;
+    }
+
+    .btn-reset {
+      background: #1e1e2e;
+      color: #aaa;
+      border: 1px solid #333;
+    }
+
+    .btn-reset:hover { color: #fff; border-color: #555; }
+
+    .done-msg {
+      margin-top: 24px;
+      font-size: 1.1rem;
+      color: #48cfad;
+      letter-spacing: 0.15em;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .done-msg.show { opacity: 1; }
+
+    .alarm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .alarm-overlay.show { display: flex; }
+
+    .alarm-box {
+      background: #1a1a2e;
+      border: 2px solid #48cfad;
+      border-radius: 24px;
+      padding: 48px 56px;
+      text-align: center;
+      animation: pulse-border 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(72,207,173,0.4); }
+      50% { box-shadow: 0 0 0 20px rgba(72,207,173,0); }
+    }
+
+    .alarm-icon { font-size: 3.5rem; margin-bottom: 16px; }
+
+    .alarm-text {
+      font-size: 1.8rem;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      color: #48cfad;
+      margin-bottom: 32px;
+    }
+
+    .btn-stop-alarm {
+      padding: 14px 44px;
+      background: linear-gradient(135deg, #6c63ff, #48cfad);
+      border: none;
+      border-radius: 50px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+    }
+
+    .btn-stop-alarm:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>10분 타이머</h1>
+
+  <div class="ring-wrap">
+    <svg viewBox="0 0 300 300">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#6c63ff"/>
+          <stop offset="100%" style="stop-color:#48cfad"/>
+        </linearGradient>
+      </defs>
+      <circle class="bg-circle" cx="150" cy="150" r="130"/>
+      <circle class="progress-circle" id="ring" cx="150" cy="150" r="130"/>
+    </svg>
+    <div class="time-display" id="display">10:00</div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-start" id="startBtn" onclick="toggleTimer()">시작</button>
+    <button class="btn-reset" onclick="resetTimer()">초기화</button>
+  </div>
+
+  <div class="done-msg" id="doneMsg">완료!</div>
+</div>
+
+<div class="alarm-overlay" id="alarmOverlay">
+  <div class="alarm-box">
+    <div class="alarm-icon">⏰</div>
+    <div class="alarm-text">10분 완료!</div>
+    <button class="btn-stop-alarm" onclick="stopAlarm()">알람 끄기</button>
+  </div>
+</div>
+
+<script>
+  const TOTAL = 600;
+  let remaining = TOTAL;
+  let running = false;
+  let interval = null;
+
+  const ring = document.getElementById('ring');
+  const display = document.getElementById('display');
+  const startBtn = document.getElementById('startBtn');
+  const doneMsg = document.getElementById('doneMsg');
+  const CIRCUMFERENCE = 2 * Math.PI * 130; // ~817
+
+  ring.style.strokeDasharray = CIRCUMFERENCE;
+  ring.style.strokeDashoffset = 0;
+
+  function updateDisplay() {
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const offset = CIRCUMFERENCE * (1 - remaining / TOTAL);
+    ring.style.strokeDashoffset = offset;
+  }
+
+  function toggleTimer() {
+    if (remaining === 0) return;
+    running = !running;
+    startBtn.textContent = running ? '일시정지' : '시작';
+    if (running) {
+      interval = setInterval(() => {
+        remaining--;
+        updateDisplay();
+        if (remaining <= 0) {
+          clearInterval(interval);
+          running = false;
+          startBtn.textContent = '시작';
+          doneMsg.classList.add('show');
+          startAlarm();
+        }
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+  }
+
+  function resetTimer() {
+    clearInterval(interval);
+    running = false;
+    remaining = TOTAL;
+    startBtn.textContent = '시작';
+    doneMsg.classList.remove('show');
+    stopAlarm();
+    updateDisplay();
+  }
+
+  let alarmCtx = null;
+  let alarmInterval = null;
+
+  function playBeepPattern() {
+    try {
+      if (!alarmCtx) alarmCtx = new AudioContext();
+      const now = alarmCtx.currentTime;
+      // 빠른 3연속 비프 패턴
+      [0, 0.22, 0.44].forEach(t => {
+        const o = alarmCtx.createOscillator();
+        const g = alarmCtx.createGain();
+        o.connect(g); g.connect(alarmCtx.destination);
+        o.type = 'sine';
+        o.frequency.value = 1040;
+        g.gain.setValueAtTime(0, now + t);
+        g.gain.linearRampToValueAtTime(0.5, now + t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.18);
+        o.start(now + t);
+        o.stop(now + t + 0.2);
+      });
+    } catch(e) {}
+  }
+
+  function startAlarm() {
+    document.getElementById('alarmOverlay').classList.add('show');
+    playBeepPattern();
+    alarmInterval = setInterval(playBeepPattern, 1200);
+  }
+
+  function stopAlarm() {
+    document.getElementById('alarmOverlay').classList.remove('show');
+    clearInterval(alarmInterval);
+    alarmInterval = null;
+    if (alarmCtx) { alarmCtx.close(); alarmCtx = null; }
+  }
+
+  updateDisplay();
+</script>
+</body>
+</html>
