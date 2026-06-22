@@ -124,6 +124,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   position:relative;overflow:hidden;
   min-height:100px;
 }
+.cat-card{transition:transform .2s,box-shadow .2s;}
+.cat-card:hover{transform:scale(1.04);box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .cat-card:active{transform:scale(.96);}
 .cat-card-emoji{font-size:1.6rem;line-height:1;}
 .cat-card-name{font-size:1rem;font-weight:800;color:#fff;line-height:1.2;}
@@ -155,7 +157,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   border:1px solid var(--border);overflow:hidden;cursor:pointer;
   transition:transform .2s,box-shadow .2s;
 }
-.product-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(106,47,160,.3);}
+.product-card:hover{transform:scale(1.04);box-shadow:0 8px 24px rgba(106,47,160,.4);}
 .product-card:active{transform:scale(.97);}
 .product-thumb{
   width:100%;aspect-ratio:16/9;
