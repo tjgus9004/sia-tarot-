@@ -197,7 +197,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .nav-item.active .nav-label{color:var(--purple);}
 .nav-free-btn{
   display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
-  position:relative;top:-18px;z-index:21;
+  position:relative;transform:translateY(-18px);z-index:21;
 }
 .nav-free-inner{
   width:58px;height:58px;background:linear-gradient(135deg,var(--purple),#3a1060);
@@ -576,7 +576,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   <div class="banner">
     <div class="banner-sub" id="banner-sub-el">카드가 당신에게 말을 건네고 있습니다</div>
     <div class="banner-title" id="banner-title-el">당신의 운명을<br>읽어드립니다</div>
-    <div style="font-size:1.8rem;animation:bounce 1.5s infinite;">↓</div>
+    <div style="display:flex;align-items:center;gap:8px;color:#fff;font-size:.9rem;font-weight:700;">무료보기 <span style="animation:bounce 1.5s infinite;display:inline-block;">↓</span></div>
     <div class="banner-art">
       <div class="tarot-card-mini card-left"><div class="star-pattern"></div></div>
       <div class="tarot-card-mini card-mid"><div class="star-pattern"></div></div>
