@@ -586,10 +586,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 
   <div class="bottom-nav">
     <div class="nav-item active" onclick="goHome()"><div class="nav-icon">🏠</div><div class="nav-label">홈</div></div>
+    <div class="nav-item" onclick="openArchive()"><div class="nav-icon">📂</div><div class="nav-label">보관함</div></div>
     <div class="nav-free-btn" onclick="startFreeReading()">
       <div class="nav-free-inner">🔮</div>
       <div class="nav-free-label">무료타로</div>
     </div>
+    <div class="nav-item" onclick="openMyPage()"><div class="nav-icon">👤</div><div class="nav-label">마이페이지</div></div>
     <div class="nav-item" id="nav-admin-btn" style="display:none;" onclick="openAdmin()"><div class="nav-icon">⚙️</div><div class="nav-label">설정</div></div>
   </div>
 </div>
@@ -639,6 +641,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
     <h2 id="result-screen-title">타로 결과</h2>
   </div>
   <div class="result-body" id="result-body"></div>
+  <div style="padding:16px;">
+    <button onclick="saveToArchive()" style="width:100%;padding:13px;background:var(--card);border:1px solid rgba(201,168,76,.3);border-radius:12px;color:var(--gold);font-size:.95rem;cursor:pointer;">📂 보관함에 저장 (24시간)</button>
+  </div>
 </div>
 
 
@@ -1838,6 +1843,101 @@ function showResults(){
 }
 
 function goHome(){setScreen('screen-home');renderHome();}
+
+function saveToArchive(){
+  const html = document.getElementById('result-body').innerHTML;
+  const title = document.getElementById('result-screen-title').textContent || '타로 리딩';
+  const raw = store.get('reading_archive');
+  let list = [];
+  try{ list = JSON.parse(raw)||[]; }catch(e){}
+  const now = Date.now();
+  list = list.filter(r => now - r.savedAt < 86400000);
+  list.unshift({ title, html, savedAt: now });
+  if(list.length > 20) list = list.slice(0, 20);
+  store.set('reading_archive', JSON.stringify(list));
+  alert('보관함에 저장됐어요! (24시간 보관)');
+}
+
+function openArchive(){
+  const raw = store.get('reading_archive');
+  let list = [];
+  try{ list = JSON.parse(raw)||[]; }catch(e){}
+  // 1일 지난 항목 제거
+  const now = Date.now();
+  list = list.filter(r => now - r.savedAt < 86400000);
+  store.set('reading_archive', JSON.stringify(list));
+
+  const el = document.getElementById('screen-home');
+  const prev = document.getElementById('screen-archive');
+  if(prev) prev.remove();
+
+  const scr = document.createElement('div');
+  scr.id = 'screen-archive';
+  scr.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;padding:20px;';
+  scr.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <span onclick="this.parentElement.parentElement.remove()" style="cursor:pointer;font-size:1.4rem;">←</span>
+      <span style="font-size:1.1rem;font-weight:700;color:var(--gold);">📂 리딩 보관함</span>
+    </div>
+    <p style="color:var(--text-sub);font-size:.85rem;margin-bottom:16px;">리딩 결과는 24시간 동안 보관됩니다.</p>
+    ${list.length === 0
+      ? '<p style="color:var(--text-sub);text-align:center;margin-top:60px;">저장된 리딩이 없습니다.</p>'
+      : list.map((r,i) => `
+        <div style="background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;" onclick="showArchivedReading(${i})">
+          <div style="font-weight:700;color:var(--text-main);">${r.title}</div>
+          <div style="font-size:.8rem;color:var(--text-sub);margin-top:4px;">${new Date(r.savedAt).toLocaleString('ko-KR')}</div>
+        </div>`).join('')
+    }
+  `;
+  document.getElementById('app').appendChild(scr);
+}
+
+window.showArchivedReading = function(i){
+  const raw = store.get('reading_archive');
+  let list = [];
+  try{ list = JSON.parse(raw)||[]; }catch(e){}
+  const r = list[i];
+  if(!r) return;
+  document.getElementById('result-content').innerHTML = r.html;
+  setScreen('screen-result');
+  const arch = document.getElementById('screen-archive');
+  if(arch) arch.remove();
+};
+
+function openMyPage(){
+  const prev = document.getElementById('screen-mypage');
+  if(prev) prev.remove();
+
+  const ku = store.get('kuser');
+  let user = null;
+  try{ user = JSON.parse(ku); }catch(e){}
+
+  const scr = document.createElement('div');
+  scr.id = 'screen-mypage';
+  scr.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;padding:20px;';
+  scr.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <span onclick="this.parentElement.parentElement.remove()" style="cursor:pointer;font-size:1.4rem;">←</span>
+      <span style="font-size:1.1rem;font-weight:700;color:var(--gold);">👤 마이페이지</span>
+    </div>
+    ${user ? `
+      <div style="display:flex;align-items:center;gap:16px;background:var(--card);border-radius:16px;padding:20px;margin-bottom:20px;">
+        ${user.avatar ? `<img src="${user.avatar}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">` : `<div style="width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">👤</div>`}
+        <div>
+          <div style="font-weight:700;font-size:1.1rem;color:var(--text-main);">${user.name}</div>
+          <div style="font-size:.85rem;color:var(--text-sub);">카카오 로그인</div>
+        </div>
+      </div>
+      <button onclick="store.remove('kuser');updateUserBar(null);this.closest('#screen-mypage').remove();" style="width:100%;padding:14px;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text-sub);font-size:.95rem;cursor:pointer;">로그아웃</button>
+    ` : `
+      <div style="text-align:center;margin-top:60px;">
+        <p style="color:var(--text-sub);margin-bottom:20px;">로그인하면 리딩 기록을 저장할 수 있어요.</p>
+        <button onclick="kakaoLogin()" style="padding:14px 32px;background:#FEE500;border:none;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;color:#000;">카카오 로그인</button>
+      </div>
+    `}
+  `;
+  document.getElementById('app').appendChild(scr);
+}
 
 // ══════════════════════════════════════════════════════
 
