@@ -83,7 +83,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   color:#fff;padding:9px 22px;border-radius:25px;font-size:.85rem;font-weight:700;
   border:none;cursor:pointer;
 }
-.banner-art{position:absolute;right:16px;bottom:16px;width:86px;height:76px;}
+.banner-art{position:absolute;right:16px;bottom:16px;width:86px;height:76px;pointer-events:none;}
 .tarot-card-mini{
   width:30px;height:50px;border-radius:4px;
   background:linear-gradient(160deg,#1a0a3a,#2a0a5a);
@@ -584,7 +584,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 
   <div id="home-footer"></div>
 
-  <div class="bottom-nav">
+</div>
+
+<div class="bottom-nav">
     <div class="nav-item active" onclick="goHome()"><div class="nav-icon">🏠</div><div class="nav-label">홈</div></div>
     <div class="nav-item" onclick="openArchive()"><div class="nav-icon">📂</div><div class="nav-label">보관함</div></div>
     <div class="nav-free-btn" onclick="startFreeReading()">
@@ -593,7 +595,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
     </div>
     <div class="nav-item" onclick="openMyPage()"><div class="nav-icon">👤</div><div class="nav-label">마이페이지</div></div>
     <div class="nav-item" id="nav-admin-btn" style="display:none;" onclick="openAdmin()"><div class="nav-icon">⚙️</div><div class="nav-label">설정</div></div>
-  </div>
 </div>
 
 <!-- ══ 상품 목록 화면 ══ -->
