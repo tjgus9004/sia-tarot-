@@ -425,6 +425,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .test-loading{display:none;flex-direction:column;align-items:center;gap:12px;padding:10px 0;}
 .spinner{width:36px;height:36px;border:3px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 .btn-test-pay{
   width:100%;background:linear-gradient(135deg,var(--gold),#8a6a20);
   color:#0a0712;border:none;border-radius:12px;
@@ -575,7 +576,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
   <div class="banner">
     <div class="banner-sub" id="banner-sub-el">카드가 당신에게 말을 건네고 있습니다</div>
     <div class="banner-title" id="banner-title-el">당신의 운명을<br>읽어드립니다</div>
-    <button class="banner-btn" onclick="startFreeReading()">무료로 보기</button>
+    <div style="font-size:1.8rem;animation:bounce 1.5s infinite;">↓</div>
     <div class="banner-art">
       <div class="tarot-card-mini card-left"><div class="star-pattern"></div></div>
       <div class="tarot-card-mini card-mid"><div class="star-pattern"></div></div>
@@ -1066,7 +1067,7 @@ function renderHome(){
   const grid = $('cat-grid');
   if(!grid) return;
   grid.innerHTML = CAT_META.map(m=>`
-    <div class="cat-card" style="background:${m.color};" onclick="openCategory('${m.cat}')">
+    <div class="cat-card" style="background:${m.color};" onclick="${m.cat==='daily' ? 'startFreeReading()' : `openCategory('${m.cat}')`}">
       ${m.cat==='daily' ? '<div style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,.2);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;">FREE</div>' : ''}
       <div class="cat-card-emoji">${m.emoji}</div>
       <div class="cat-card-name">${m.name}</div>
