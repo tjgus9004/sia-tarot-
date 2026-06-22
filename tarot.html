@@ -81,7 +81,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .banner-btn{
   display:inline-block;background:linear-gradient(135deg,var(--pink),#b03070);
   color:#fff;padding:9px 22px;border-radius:25px;font-size:.85rem;font-weight:700;
-  border:none;cursor:pointer;
+  border:none;cursor:pointer;position:relative;z-index:10;
 }
 .banner-art{position:absolute;right:16px;bottom:16px;width:86px;height:76px;pointer-events:none;}
 .tarot-card-mini{
@@ -114,7 +114,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0;}
 .cat-card{
   border-radius:14px;padding:18px 14px 16px;cursor:pointer;
-  display:flex;flex-direction:column;gap:6px;
+  display:flex;flex-direction:column;gap:6px;position:relative;
   border:1px solid rgba(255,255,255,.1);
   transition:transform .18s,box-shadow .18s;
   position:relative;overflow:hidden;
@@ -1064,6 +1064,7 @@ function renderHome(){
   if(!grid) return;
   grid.innerHTML = CAT_META.map(m=>`
     <div class="cat-card" style="background:${m.color};" onclick="openCategory('${m.cat}')">
+      ${m.cat==='daily' ? '<div style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,.2);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;">FREE</div>' : ''}
       <div class="cat-card-emoji">${m.emoji}</div>
       <div class="cat-card-name">${m.name}</div>
       <div class="cat-card-desc">${m.desc}</div>
