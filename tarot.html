@@ -646,9 +646,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
     <h2 id="result-screen-title">타로 결과</h2>
   </div>
   <div class="result-body" id="result-body"></div>
-  <div style="padding:16px;">
-    <button onclick="saveToArchive()" style="width:100%;padding:13px;background:var(--card);border:1px solid rgba(201,168,76,.3);border-radius:12px;color:var(--gold);font-size:.95rem;cursor:pointer;">📂 보관함에 저장 (24시간)</button>
-  </div>
 </div>
 
 
@@ -1842,10 +1839,26 @@ function showResults(){
     </div>`;
   }
 
+  if(isFreeReading){
+    html+=`<div style="text-align:center;font-size:.8rem;color:var(--dim);margin-bottom:8px;">무료 리딩은 보관함에 저장되지 않습니다.</div>`;
+  }
   html+=`<button class="btn-again" onclick="goHome()">🏠 홈으로 돌아가기</button>`;
 
   $('result-body').innerHTML=html;
   setScreen('screen-result');
+
+  // 유료 리딩은 자동 보관함 저장, 무료는 안내
+  if(!isFreeReading){
+    const title = $('result-screen-title').textContent || '타로 리딩';
+    const raw = store.get('reading_archive');
+    let list = [];
+    try{ list = JSON.parse(raw)||[]; }catch(e){}
+    const now = Date.now();
+    list = list.filter(r => now - r.savedAt < 86400000);
+    list.unshift({ title, html, savedAt: now });
+    if(list.length > 20) list = list.slice(0, 20);
+    store.set('reading_archive', JSON.stringify(list));
+  }
 }
 
 function goHome(){setScreen('screen-home');renderHome();}
