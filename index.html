@@ -197,7 +197,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
 .nav-item.active .nav-label{color:var(--purple);}
 .nav-free-btn{
   display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
-  position:relative;top:-8px;
+  position:relative;top:-18px;z-index:21;
 }
 .nav-free-inner{
   width:58px;height:58px;background:linear-gradient(135deg,var(--purple),#3a1060);
@@ -567,7 +567,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto S
     </div>
     <div class="header-right">
       <div class="user-badge" id="user-badge-btn">회원님</div>
-      <button class="menu-btn" onclick="openAdmin()">☰</button>
     </div>
   </div>
 
