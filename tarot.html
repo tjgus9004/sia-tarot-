@@ -1926,10 +1926,23 @@ window.showArchivedReading = function(i){
   try{ list = JSON.parse(raw)||[]; }catch(e){}
   const r = list[i];
   if(!r) return;
-  document.getElementById('result-content').innerHTML = r.html;
-  setScreen('screen-result');
   const arch = document.getElementById('screen-archive');
   if(arch) arch.remove();
+
+  const prev = document.getElementById('screen-archive-result');
+  if(prev) prev.remove();
+
+  const scr = document.createElement('div');
+  scr.id = 'screen-archive-result';
+  scr.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:210;overflow-y:auto;padding:20px;padding-bottom:100px;';
+  scr.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <span onclick="this.parentElement.parentElement.remove();openArchive();" style="cursor:pointer;font-size:1.4rem;">←</span>
+      <span style="font-size:1rem;font-weight:700;color:var(--gold);">${r.title}</span>
+    </div>
+    ${r.html}
+  `;
+  document.getElementById('app').appendChild(scr);
 };
 
 function openMyPage(){
