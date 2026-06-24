@@ -1870,7 +1870,14 @@ function showResults(){
   }
 }
 
-function goHome(){setScreen('screen-home');renderHome();}
+function goHome(){
+  const ar = document.getElementById('screen-archive-result');
+  if(ar) ar.remove();
+  const arch = document.getElementById('screen-archive');
+  if(arch) arch.remove();
+  setScreen('screen-home');
+  renderHome();
+}
 
 function saveToArchive(){
   const html = document.getElementById('result-body').innerHTML;
@@ -1934,7 +1941,7 @@ window.showArchivedReading = function(i){
 
   const scr = document.createElement('div');
   scr.id = 'screen-archive-result';
-  scr.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:210;overflow-y:auto;padding:20px;padding-bottom:100px;';
+  scr.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:210;overflow-y:auto;padding:20px;padding-bottom:120px;';
   scr.innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
       <span onclick="this.parentElement.parentElement.remove();openArchive();" style="cursor:pointer;font-size:1.4rem;">←</span>
